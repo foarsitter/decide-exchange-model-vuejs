@@ -73,7 +73,7 @@ export default class ExchangeComponent extends Vue {
       value: [this.exchange.turtle.position, this.exchange.rabbit.position]
     };
   }
-  change(value: number, index: number) {
+  change(value: number[], index: number) {
     this.actor_issues[index].position = value[index];
   }
 }
