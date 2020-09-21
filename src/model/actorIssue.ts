@@ -10,4 +10,12 @@ export default class ActorIssue {
     this.position = position;
     this.actor = actor;
   }
+
+  calcPowerSalience() {
+    return this.salience * this.actor.power;
+  }
+
+  calcPositionPowerSalience() {
+    return this.calcPowerSalience() * this.position;
+  }
 }

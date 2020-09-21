@@ -28,7 +28,7 @@
 import "vue-slider-component/theme/default.css";
 import "vue-slider-component/theme/antd.css";
 
-import { Component, Prop, Vue, Watch } from "vue-property-decorator";
+import { Component, Prop, Vue } from "vue-property-decorator";
 import SingleValueSlider from "@/components/sliders/SingleValueSlider.vue";
 import Actor from "@/model/actor";
 
@@ -41,15 +41,5 @@ export default class PowerComponent extends Vue {
 
   @Prop(Actor)
   turtle!: Actor;
-
-  @Watch("rabbit.power")
-  rabbitChanged() {
-    console.log("rabbit is going strong");
-  }
-
-  @Watch("turtle.power")
-  turtleChanged() {
-    console.log("turtle is going strong");
-  }
 }
 </script>

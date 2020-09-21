@@ -12,12 +12,16 @@
             <div class="column">
               <p class="title">Position</p>
               <vue-slider
-                v-model="value"
+                ref="xyzSlider"
+                v-model="xyz"
                 :min="0"
                 :tooltip="'always'"
                 :order="false"
                 :max="100"
                 :interval="1"
+                :tooltipPlacement="['top', 'top', 'bottom']"
+                :dot-options="dotOptions"
+                :lazy="true"
                 @change="change"
               >
                 <template #tooltip="{ index, value }">
@@ -50,13 +54,12 @@ import "vue-slider-component/theme/default.css";
 import "vue-slider-component/theme/antd.css";
 
 import { Component, Prop, Vue } from "vue-property-decorator";
-import IssueSlider from "@/components/sliders/PositionSlider.vue";
 import SingleValueSlider from "@/components/sliders/SingleValueSlider.vue";
 import Exchange from "@/model/exchange";
 import VueSlider from "vue-slider-component";
 
 @Component({
-  components: { SingleValueSlider, IssueSlider, VueSlider }
+  components: { SingleValueSlider, VueSlider }
 })
 export default class ExchangeComponent extends Vue {
   @Prop(Exchange)
@@ -65,16 +68,37 @@ export default class ExchangeComponent extends Vue {
   actor_issues = [this.exchange.turtle, this.exchange.rabbit];
 
   actorName(index: number) {
+    if (index == 2) {
+      return "mds";
+    }
     return this.actor_issues[index].actor.name;
   }
 
+  xyz = [
+    this.exchange.turtle.position,
+    this.exchange.rabbit.position,
+    this.exchange.mds
+  ];
+
   data() {
     return {
-      value: [this.exchange.turtle.position, this.exchange.rabbit.position]
+      dotOptions: [
+        {
+          disabled: false
+        },
+        {
+          disabled: false
+        },
+        {
+          disabled: true
+        }
+      ]
     };
   }
   change(value: number[], index: number) {
-    this.actor_issues[index].position = value[index];
+    if (index != 2) {
+      this.actor_issues[index].position = value[index];
+    }
   }
 }
 </script>
