@@ -5,10 +5,10 @@ export default class ActorIssue {
   position: number;
   actor: Actor;
 
-  constructor(salience: number, position: number, actor: Actor) {
-    this.salience = salience;
-    this.position = position;
+  constructor(actor: Actor, position: number, salience: number) {
     this.actor = actor;
+    this.position = position;
+    this.salience = salience;
   }
 
   calcPowerSalience() {

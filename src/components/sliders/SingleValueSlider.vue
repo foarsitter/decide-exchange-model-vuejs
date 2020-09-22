@@ -8,7 +8,9 @@
         :value="value"
         :min="0"
         :max="1"
-        :interval="0.01"
+        :interval="0.05"
+        :tooltip="'always'"
+        lazy
         @change="change"
       ></vue-slider>
     </div>
@@ -19,7 +21,6 @@
 import VueSlider from "vue-slider-component";
 
 import "vue-slider-component/theme/default.css";
-import "vue-slider-component/theme/antd.css";
 
 import { Component, Prop, Vue } from "vue-property-decorator";
 
