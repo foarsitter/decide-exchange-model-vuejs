@@ -127,7 +127,7 @@ describe("exchange.ts", () => {
     expect(model.jDemand).toEqual(model.p);
 
     expect(model.calcExchangeRatioP(model.iSupply)).toBeCloseTo(14.285);
-    expect(model.calcExchangeRatioQ(model.iSupply, model.jSupply)).toBeCloseTo(
+    expect(model.calcExchangeRatioQ(model.jSupply, model.iSupply)).toBeCloseTo(
       7.1428
     );
 
@@ -168,5 +168,12 @@ describe("exchange.ts", () => {
 
     expect(max["j"]).toBeCloseTo(1400);
     expect(max["i"]).toBeCloseTo(777.777);
+
+    model.rValue = 0.5;
+    model.pValue = 0.75;
+
+    // const x = model.interval();
+    // const y = model.interval2();
+    // expect(x);
   });
 });

@@ -6,6 +6,11 @@ export default class Model {
   iDemand: Exchange;
   iSupply: Exchange;
 
+  pValue = 0.75;
+  rValue = 0.5;
+  useX = false;
+  useRight = true;
+
   get euMaxI(): Record<string, number> {
     const supply = this.iSupply;
     const gain = this.iGain;
@@ -18,8 +23,8 @@ export default class Model {
     const delta1 = loss / (supply.demand.salience * s);
     const delta2 = gain / (supply.supply.salience * s);
 
-    const euMaxJ = supply.demand.salience * s * delta2 - loss;
     const euMaxI = gain - supply.supply.salience * s * delta1;
+    const euMaxJ = supply.demand.salience * s * delta2 - loss;
 
     return { i: euMaxI, j: euMaxJ };
   }
@@ -213,5 +218,37 @@ export default class Model {
     q.move = Math.abs(q.demand.position - q.supply.position);
 
     return q.move;
+  }
+
+  interval(): number[] {
+    const eu = this.expectedUtilityI;
+
+    const x =
+      eu +
+      this.pValue *
+        this.rValue *
+        (this.useRight ? this.euMaxI["i"] : this.euMaxI["j"] - eu);
+    const y = eu - this.pValue * this.rValue * eu;
+    // eui = eu + p * z * (self.eu_max - eu)
+
+    // eui = eu - p * z * eu
+
+    return [x, y];
+  }
+
+  interval2(): number[] {
+    const eu = this.expectedUtilityI;
+
+    const x =
+      eu +
+      this.pValue *
+        this.rValue *
+        (this.useRight ? this.euMaxJ["i"] : this.euMaxJ["j"] - eu);
+    const y = eu - this.pValue * this.rValue * eu;
+    // eui = eu + p * z * (self.eu_max - eu)
+
+    // eui = eu - p * z * eu
+
+    return [x, y];
   }
 }

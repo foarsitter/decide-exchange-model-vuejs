@@ -16,6 +16,9 @@ export default class Exchange {
 
     this.demand = this.rabbit;
     this.supply = this.turtle;
+
+    this.demand.exchange = this;
+    this.supply.exchange = this;
   }
 
   private _mds = 0.0;
