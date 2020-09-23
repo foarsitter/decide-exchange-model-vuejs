@@ -101,11 +101,9 @@ export default class ResultsComponent extends Vue {
 
   get chartOptions() {
     return {
-      chart: {
-        id: "vuechart-example",
-        stroke: {
-          curve: "smooth"
-        }
+      stroke: {
+        curve: "straight",
+        width: 1
       }
     };
   }
