@@ -14,40 +14,49 @@
         <template #icon>X-value</template>
       </SingleValueSlider>
       <div class="columns">
-        <div class="column is-one-fifth"></div>
-
-        <div class="field">
-          <input
-            v-model="model.useX"
-            id="switchRoundedDefault"
-            type="checkbox"
-            name="switchRoundedDefault"
-            class="switch is-rounded"
-            checked="checked"
-          />
-          <label for="switchRoundedDefault"
-            >Choice
-            <span v-if="model.useX">{{ model.iSupply.supply.actor.name }}</span>
-            <span v-else>{{ model.iSupply.demand.actor.name }}</span> as random
-            actor</label
-          >
+        <div class="column is-one-fifth">Actor</div>
+        <div class="column has-text-left">
+          <div class="control">
+            <label class="radio"
+              ><input
+                type="radio"
+                v-model="model.selectedActor"
+                v-bind:value="model.iSupply.supply.actor.name"
+              />
+              {{ model.iSupply.supply.actor.name }}</label
+            >
+            <label class="radio"
+              ><input
+                type="radio"
+                v-model="model.selectedActor"
+                v-bind:value="model.jSupply.supply.actor.name"
+              />
+              {{ model.jSupply.supply.actor.name }}</label
+            >
+          </div>
         </div>
       </div>
       <div class="columns mt-2">
-        <div class="column is-one-fifth"></div>
-        <div class="field">
-          <input
-            v-model="model.useRight"
-            id="switchRoundedDefault2"
-            type="checkbox"
-            name="switchRoundedDefault"
-            class="switch is-rounded"
-            checked="checked"
-          />
-          <label for="switchRoundedDefault2"
-            ><span v-if="model.useRight">Right (X – r.X) </span>
-            <span v-else>Left (X + r (Y-X))</span></label
-          >
+        <div class="column is-one-fifth">Extra Gain or Loss</div>
+        <div class="column  has-text-left">
+          <div class="control">
+            <label class="radio"
+              ><input
+                type="radio"
+                v-model="model.extraGainOrLoss"
+                value="gain"
+              />
+              Gain</label
+            >
+            <label class="radio"
+              ><input
+                type="radio"
+                v-model="model.extraGainOrLoss"
+                value="loss"
+              />
+              Loss</label
+            >
+          </div>
         </div>
       </div>
     </div>
@@ -58,14 +67,14 @@
 import "vue-slider-component/theme/default.css";
 
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Model from "@/model/model";
+import Interchange from "@/model/interchange";
 import SingleValueSlider from "@/components/sliders/SingleValueSlider.vue";
 
 @Component({
   components: { SingleValueSlider }
 })
 export default class REXComponent extends Vue {
-  @Prop(Model)
-  model!: Model;
+  @Prop(Interchange)
+  model!: Interchange;
 }
 </script>

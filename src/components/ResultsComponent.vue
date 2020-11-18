@@ -16,12 +16,12 @@
                 </td>
               </tr>
               <tr>
-                <td>{{ model.iSupply.supply.actor.name }}</td>
-                <td>{{ model.exchangeRatioP.toFixed(2) }}</td>
+                <td>{{ model.paretoOptimalExchange.issue }}</td>
+                <td>{{ exchangeRatioP.toFixed(2) }}</td>
               </tr>
               <tr>
-                <td>{{ model.jSupply.supply.actor.name }}</td>
-                <td>{{ model.exchangeRatioQ.toFixed(2) }}</td>
+                <td>{{ model.partialShiftExchange.issue }}</td>
+                <td>{{ exchangeRatioQ.toFixed(2) }}</td>
               </tr>
               <tr>
                 <td colspan="2">
@@ -29,12 +29,16 @@
                 </td>
               </tr>
               <tr>
+                <td>Equal Gain</td>
+                <td>{{ equalGain.toFixed(2) }}</td>
+              </tr>
+              <tr>
                 <td>{{ model.iSupply.supply.actor.name }}</td>
-                <td>{{ model.expectedUtilityI.toFixed(2) }}</td>
+                <td>{{ eui.toFixed(2) }}</td>
               </tr>
               <tr>
                 <td>{{ model.jSupply.supply.actor.name }}</td>
-                <td>{{ model.expectedUtilityI.toFixed(2) }}</td>
+                <td>{{ euj.toFixed(2) }}</td>
               </tr>
               <tr>
                 <td colspan="2">
@@ -44,27 +48,44 @@
               <tr>
                 <td>{{ model.iSupply.supply.actor.name }}</td>
                 <td>
-                  {{ model.euMaxI["i"].toFixed(4) }} -
-                  {{ model.euMaxI["j"].toFixed(4) }}
+                  {{ euMaxI.toFixed(4) }}
                 </td>
               </tr>
               <tr>
                 <td>{{ model.jSupply.supply.actor.name }}</td>
                 <td>
-                  {{ model.euMaxJ["j"].toFixed(4) }} -
-                  {{ model.euMaxJ["i"].toFixed(4) }}
+                  {{ euMaxJ.toFixed(4) }}
                 </td>
               </tr>
               <tr>
-                <td>interval 1</td>
-                <td>
-                  {{ model.interval() }}
+                <td colspan="2">
+                  Loss / Gain
                 </td>
               </tr>
               <tr>
-                <td>interval 2</td>
+                <td>{{ model.iSupply.supply.actor.name }}</td>
                 <td>
-                  {{ model.interval2() }}
+                  <table>
+                    <tr>
+                      <td>- {{ supplyLossI.toFixed(2) }}</td>
+                      <td>
+                        {{ demandGainI.toFixed(2) }}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td>{{ model.jSupply.supply.actor.name }}</td>
+                <td>
+                  <table>
+                    <tr>
+                      <td>- {{ supplyLossJ.toFixed(2) }}</td>
+                      <td>
+                        {{ demandGainJ.toFixed(2) }}
+                      </td>
+                    </tr>
+                  </table>
                 </td>
               </tr>
             </table>
@@ -87,7 +108,7 @@
 import "vue-slider-component/theme/default.css";
 
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Model from "@/model/model";
+import Interchange from "@/model/interchange";
 import VueApexCharts from "vue-apexcharts";
 
 @Component({
@@ -96,8 +117,32 @@ import VueApexCharts from "vue-apexcharts";
   }
 })
 export default class ResultsComponent extends Vue {
-  @Prop(Model)
-  model!: Model;
+  @Prop(Interchange)
+  model!: Interchange;
+  @Prop(Number)
+  eui!: number;
+  @Prop(Number)
+  euj!: number;
+  @Prop(Number)
+  equalGain!: number;
+  @Prop(Number)
+  exchangeRatioP!: number;
+  @Prop(Number)
+  exchangeRatioQ!: number;
+  @Prop(Number)
+  euMaxI!: number;
+  @Prop(Number)
+  euMaxJ!: number;
+  @Prop(Number)
+  supplyLossI!: number;
+  @Prop(Number)
+  supplyLossJ!: number;
+  @Prop(Number)
+  demandGainI!: number;
+  @Prop(Number)
+  demandGainJ!: number;
+  @Prop(Array)
+  paretoFrontier!: number[];
 
   get chartOptions() {
     return {
@@ -110,29 +155,41 @@ export default class ResultsComponent extends Vue {
 
   get series() {
     return [
-      // {
-      //   name: "euMaxI",
-      //   data: [
-      //     [0, this.model.euMaxI["j"]],
-      //     this.model.interval(),
-      //     [this.model.euMaxI["i"], 0]
-      //   ]
-      // },
       {
-        name: "mds",
+        name: "Random interval " + this.model.jSupply.demand.actor.name,
         data: [
-          [0, this.model.expectedUtilityJ],
-          [this.model.expectedUtilityJ, this.model.expectedUtilityJ],
-          [this.model.expectedUtilityJ, 0]
+          [this.model.lowerLoss() * 100, 0],
+          [this.equalGain * 100, 0],
+          [this.model.upperGainJ() * 100, 0]
         ]
       },
       {
-        name: "euMaxJ",
+        name: "Random interval " + this.model.iSupply.demand.actor.name,
         data: [
-          [0, this.model.euMaxJ["i"]],
-          [this.model.interval2()[1], this.model.interval2()[0]],
-          [this.model.euMaxJ["j"], 0]
+          [0, this.model.lowerLoss() * 100],
+          [0, this.equalGain * 100],
+          [0, this.model.upperGainI() * 100]
         ]
+      },
+      {
+        name: "Equal Gain",
+        data: [
+          [0, this.equalGain * 100],
+          [this.equalGain * 100, this.equalGain * 100],
+          [this.equalGain * 100, 0]
+        ]
+      },
+      {
+        name: "Pareto frontier",
+        data: [
+          [0, this.euMaxI * 100],
+          [this.paretoFrontier[0] * 100, this.paretoFrontier[1] * 100],
+          [this.euMaxJ * 100, 0]
+        ]
+      },
+      {
+        name: "REX",
+        data: this.model.xyz(100)
       }
     ];
   }

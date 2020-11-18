@@ -4,66 +4,93 @@ export default class Exchange {
   issue: string;
   demand: ActorIssue;
   supply: ActorIssue;
-  rabbit: ActorIssue;
-  turtle: ActorIssue;
-  move = 0;
-  public y = 0;
 
-  constructor(issue: string, rabbit: ActorIssue, turtle: ActorIssue) {
+  i: ActorIssue;
+  j: ActorIssue;
+
+  public move = 0;
+  public votingPosition = 0;
+
+  constructor(issue: string, i: ActorIssue, j: ActorIssue) {
     this.issue = issue;
-    this.rabbit = rabbit;
-    this.turtle = turtle;
 
-    this.demand = this.rabbit;
-    this.supply = this.turtle;
+    this.i = i;
+    this.j = j;
+
+    this.demand = i;
+    this.supply = j;
 
     this.demand.exchange = this;
     this.supply.exchange = this;
   }
 
-  private _mds = 0.0;
-
-  get mds(): number {
-    this.calcMds();
-    return this._mds;
-  }
-
-  get i(): ActorIssue {
-    return this.rabbit;
-  }
-
-  get j(): ActorIssue {
-    return this.turtle;
-  }
-
   calcPowerSalience() {
-    return this.rabbit.calcPowerSalience() + this.turtle.calcPowerSalience();
+    return this.demand.calcPowerSalience() + this.supply.calcPowerSalience();
   }
 
   calcPositionPowerSalience() {
     return (
-      this.rabbit.calcPositionPowerSalience() +
-      this.turtle.calcPositionPowerSalience()
+      this.demand.calcPositionPowerSalience() +
+      this.supply.calcPositionPowerSalience()
     );
   }
 
-  calcMds() {
-    this._mds = this.calcPositionPowerSalience() / this.calcPowerSalience();
+  MDS(): number {
+    return this.calcPositionPowerSalience() / this.calcPowerSalience();
+  }
+
+  MDSVoting(): number {
+    if (this.votingPosition === undefined) {
+      throw new Error("Calculate the voting position first");
+    }
+    return (
+      (this.votingPosition * this.supply.calcPowerSalience() +
+        this.demand.calcPositionPowerSalience()) /
+      this.calcPowerSalience()
+    );
+  }
+
+  MDSDelta(): number {
+    return this.MDS() - this.MDSVoting();
   }
 
   applyMove(): void {
+    if (this.move === undefined) {
+      throw new Error("Calculate the move first of the supply actor first");
+    }
+
     if (this.supply.position > this.demand.position) {
-      this.y = this.supply.position - this.move;
+      this.votingPosition = this.supply.position - this.move;
     } else {
-      this.y = this.supply.position + this.move;
+      this.votingPosition = this.supply.position + this.move;
     }
   }
 
-  newMDS(): number {
+  Loss(): number {
+    return this.supply.salience * this.MDSDelta();
+  }
+
+  Gain(): number {
+    return this.demand.salience * this.MDSDelta();
+  }
+
+  isParetoOptimal(): boolean {
+    return this.votingPosition == this.demand.position;
+  }
+
+  ExchangeRatioParetoOptimal(): number {
     return (
-      (this.y * this.supply.salience * this.supply.actor.power +
-        this.demand.position * this.demand.salience * this.demand.actor.power) /
+      (Math.abs(this.supply.position - this.demand.position) *
+        this.supply.calcPowerSalience()) /
       this.calcPowerSalience()
     );
+  }
+
+  PositionDelta(): number {
+    return Math.abs(this.demand.position - this.supply.position);
+  }
+
+  MoveExceedsDelta(): boolean {
+    return this.move >= this.PositionDelta();
   }
 }
