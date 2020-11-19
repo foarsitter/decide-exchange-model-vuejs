@@ -2,10 +2,20 @@
   <div class="container">
     <!--    <ConfigTable v-bind:model="model"></ConfigTable>-->
     <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
-    <Exchange v-bind:exchange="p">
+    <Exchange
+      v-bind:exchange="p"
+      v-bind:mdsVoting="mdsPVoting"
+      v-bind:voting-position="votingPositionP"
+      v-bind:move="moveP"
+    >
       <template #title>{{ p.issue }}</template>
     </Exchange>
-    <Exchange v-bind:exchange="q">
+    <Exchange
+      v-bind:exchange="q"
+      v-bind:mdsVoting="mdsQVoting"
+      v-bind:voting-position="votingPositionQ"
+      v-bind:move="moveQ"
+    >
       <template #title>{{ q.issue }}</template>
     </Exchange>
     <REXComponent v-bind:model="model"></REXComponent>
@@ -87,8 +97,19 @@ export default class Home extends Vue {
   demandGainI = 0;
   demandGainJ = 0;
 
-  paretoFrontier = [0, 0];
+  paretoFrontier = [
+    [0, 0],
+    [0, 0]
+  ];
 
+  mdsPVoting = 0;
+  mdsQVoting = 0;
+
+  votingPositionP = 0;
+  votingPositionQ = 0;
+
+  moveP = 0;
+  moveQ = 0;
   // actors
   @Watch("i.power")
   @Watch("j.power")
@@ -112,11 +133,16 @@ export default class Home extends Vue {
   }
 
   update() {
-    this.model.negotiate();
-
+    console.log("Update");
     this.equalGain = this.model.equalGain();
     this.eui = this.model.calcExpectedUtilityI();
     this.euj = this.model.calcExpectedUtilityJ();
+
+    this.mdsPVoting = this.model.p.MDSVoting();
+    this.mdsQVoting = this.model.q.MDSVoting();
+
+    this.votingPositionP = this.model.p.votingPosition;
+    this.votingPositionQ = this.model.q.votingPosition;
 
     this.exchangeRatioP = this.model.calcExchangeRatioP();
     this.exchangeRatioQ = this.model.calcExchangeRatioQ();

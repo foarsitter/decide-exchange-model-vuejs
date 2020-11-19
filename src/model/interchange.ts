@@ -1,5 +1,5 @@
 import Exchange from "@/model/exchange";
-import { maxExpectedUtility } from "@/model/calculations";
+import { maxExpectedUtility, positionForZero } from "@/model/calculations";
 
 export default class Interchange {
   p: Exchange;
@@ -201,13 +201,34 @@ export default class Interchange {
     return this.calcExpectedUtilityJ();
   }
 
-  paretoFrontier(): number[] {
+  paretoFrontier(): number[][] {
     this.negotiate();
 
-    this.iSupply.votingPosition = this.iSupply.demand.position;
-    this.jSupply.votingPosition = this.jSupply.demand.position;
+    if (this.positionForZeroGainI() < this.jDemand.demand.position) {
+      this.iSupply.votingPosition = this.iSupply.demand.position;
+      this.jSupply.votingPosition = this.jSupply.demand.position;
 
-    return [this.calcExpectedUtilityI(), this.calcExpectedUtilityJ()];
+      if (this.calcExpectedUtilityI() > 0 && this.calcExpectedUtilityJ() > 0) {
+        return [
+          [0, this.euMaxI],
+          [this.calcExpectedUtilityI(), this.calcExpectedUtilityJ()],
+          [this.euMaxJ, 0]
+        ];
+      }
+    }
+
+    return [
+      [0, this.euMaxI],
+      [this.euMaxJ, 0]
+    ];
+  }
+
+  positionForZeroGainI(): number {
+    return positionForZero(this.iSupply, this.iDemand);
+  }
+
+  positionForZeroGainJ(): number {
+    return positionForZero(this.jSupply, this.jDemand);
   }
 
   xyz(multiplier = 1): number[][] {
@@ -225,7 +246,7 @@ export default class Interchange {
 
       const frontier = this.paretoFrontier();
 
-      const y = frontier[1];
+      const y = frontier[1][1];
 
       if (gain < y) {
         const g = this.jSupply.Loss() + gain;
@@ -266,7 +287,7 @@ export default class Interchange {
 
     const frontier = this.paretoFrontier();
 
-    const y = frontier[0];
+    const y = frontier[0][0];
 
     if (gain < y) {
       const g = this.iSupply.Loss() + gain;

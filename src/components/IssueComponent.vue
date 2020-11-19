@@ -1,10 +1,10 @@
 <template>
   <section class="section">
     <div class="container">
-      <div class="card has-background-light">
+      <div class="card">
         <header class="card-header">
           <h1 class="card-header-title">
-            <slot name="title"></slot> [Equal Gain]
+            <slot name="title"></slot>
           </h1>
         </header>
         <div class="card-content">
@@ -13,7 +13,7 @@
               <vue-slider
                 class="my-6 mb-6"
                 ref="xyzSlider"
-                v-model="xyz"
+                v-model="sliderValues"
                 :min="0"
                 :tooltip="'always'"
                 :order="false"
@@ -33,10 +33,10 @@
                   <li>
                     {{ exchange.issue }} is the <strong>supply</strong> issue of
                     <strong>{{ exchange.supply.actor.name }}</strong> and moves
-                    {{ exchange.move.toFixed(2) }} to
-                    <strong>{{ exchange.votingPosition.toFixed(2) }}</strong>
+                    {{ move.toFixed(2) }} to
+                    <strong>{{ votingPosition.toFixed(2) }}</strong>
                     resulting in a mds of
-                    <strong>{{ exchange.MDSVoting().toFixed(2) }}</strong>
+                    <strong>{{ mdsVoting.toFixed(2) }}</strong>
                   </li>
                 </ul>
               </div>
@@ -72,6 +72,14 @@ import VueSlider from "vue-slider-component";
 export default class ExchangeComponent extends Vue {
   @Prop(Exchange)
   exchange!: Exchange;
+  @Prop(Number)
+  mdsVoting!: number;
+
+  @Prop(Number)
+  votingPosition!: number;
+
+  @Prop(Number)
+  move!: number;
 
   actor_issues = [this.exchange.i, this.exchange.j];
 
@@ -82,11 +90,13 @@ export default class ExchangeComponent extends Vue {
     return this.actor_issues[index].actor.name;
   }
 
-  xyz = [
-    this.exchange.i.position,
-    this.exchange.j.position,
-    this.exchange.MDS()
-  ];
+  get sliderValues() {
+    return [
+      this.exchange.i.position,
+      this.exchange.j.position,
+      this.exchange.MDS()
+    ];
+  }
 
   data() {
     return {
@@ -108,8 +118,7 @@ export default class ExchangeComponent extends Vue {
     if (index != 2) {
       this.actor_issues[index].position = value[index];
     }
-
-    this.xyz[2] = this.exchange.MDS();
+    this.sliderValues[2] = this.exchange.MDS();
   }
 
   getSlider(): VueSlider {

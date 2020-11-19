@@ -3,7 +3,7 @@
     <div class="card">
       <div class="card-header">
         <h1 class="card-header-title">
-          Results
+          REX options
         </h1>
       </div>
       <div class="card-content"></div>
@@ -14,49 +14,19 @@
         <template #icon>Random value</template>
       </SingleValueSlider>
       <div class="columns">
-        <div class="column is-one-fifth">Actor</div>
+        <div class="column is-one-fifth">Actor & Gain/Loss</div>
         <div class="column has-text-left">
-          <div class="control">
-            <label class="radio"
-              ><input
-                type="radio"
-                v-model="model.selectedActor"
-                v-bind:value="model.iSupply.supply.actor.name"
-              />
-              {{ model.iSupply.supply.actor.name }}</label
-            >
-            <label class="radio"
-              ><input
-                type="radio"
-                v-model="model.selectedActor"
-                v-bind:value="model.jSupply.supply.actor.name"
-              />
-              {{ model.jSupply.supply.actor.name }}</label
-            >
-          </div>
-        </div>
-      </div>
-      <div class="columns mt-2">
-        <div class="column is-one-fifth">Extra Gain or Loss</div>
-        <div class="column  has-text-left">
-          <div class="control">
-            <label class="radio"
-              ><input
-                type="radio"
-                v-model="model.extraGainOrLoss"
-                value="gain"
-              />
-              Gain</label
-            >
-            <label class="radio"
-              ><input
-                type="radio"
-                v-model="model.extraGainOrLoss"
-                value="loss"
-              />
-              Loss</label
-            >
-          </div>
+          Use
+          <select class="select" v-model="model.selectedActor"
+            ><option>{{ model.iSupply.supply.actor.name }}</option
+            ><option>{{ model.jSupply.supply.actor.name }}</option></select
+          >
+          as actor to calculate a simulation where {{ model.selectedActor }} has
+          <select class="select" v-model="model.extraGainOrLoss"
+            ><option value="gain">More</option
+            ><option value="loss">Less</option>
+          </select>
+          utility then in the case of Equal Gain
         </div>
       </div>
     </div>

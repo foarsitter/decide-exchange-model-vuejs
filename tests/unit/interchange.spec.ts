@@ -128,4 +128,9 @@ describe("interchange.ts", () => {
     expect(x[1][0]).toBeCloseTo(531.39);
     expect(x[1][1]).toBeCloseTo(1163.74);
   });
+  it("zero gain I", () => {
+    const model = InterchangeFactory();
+
+    expect(model.positionForZeroGainI()).toBeCloseTo(-19.5538461538462);
+  });
 });

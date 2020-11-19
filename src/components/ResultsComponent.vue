@@ -141,62 +141,115 @@ export default class ResultsComponent extends Vue {
   @Prop(Number)
   demandGainJ!: number;
   @Prop(Array)
-  paretoFrontier!: number[];
+  paretoFrontier!: number[][];
 
   get chartOptions() {
     return {
+      dataLabels: {
+        enabled: true,
+        formatter: function(val: number, opts: any) {
+          const seriesIndex = opts.seriesIndex;
+          const dataPointIndex = opts.dataPointIndex;
+
+          const x =
+            Math.round(
+              opts.w.config.series[seriesIndex].data[dataPointIndex][0] * 100
+            ) / 100;
+          const y =
+            Math.round(
+              opts.w.config.series[seriesIndex].data[dataPointIndex][1] * 100
+            ) / 100;
+
+          if (val == 0) {
+            return x;
+          }
+
+          if (x != 0) {
+            return y + "; " + x;
+          }
+
+          return Math.round(val * 100) / 100;
+        }
+      },
+      tooltip: {
+        enabled: false
+      },
       stroke: {
         curve: "straight",
         width: 1
       },
       xaxis: {
+        labels: {
+          show: false
+        },
         decimalsInFloat: 0,
         title: { text: this.model.iSupply.supply.actor.name }
       },
       yaxis: {
+        labels: {
+          show: false
+        },
         decimalsInFloat: 0,
         title: { text: this.model.jSupply.supply.actor.name }
-      }
+      },
+      colors: [
+        "#008FFB", // loss j
+        "#008FFB", // gain j
+        "#00E396", // loss i
+        "#00E396", // loss i
+        "#FEB019", // Equal Gain
+        "#FF4560", // Pareto frontier
+        "#775DD0" // REX
+      ]
     };
   }
 
   get series() {
     return [
       {
-        name: "Random interval " + this.model.jSupply.demand.actor.name,
+        name: "Loss interval " + this.model.jSupply.demand.actor.name,
         data: [
-          [this.model.lowerLoss() * 100, 0],
-          [this.equalGain * 100, 0],
-          [this.model.upperGainJ() * 100, 0]
+          [this.equalGain, 0],
+          [this.model.lowerLoss(), 0]
         ]
       },
       {
-        name: "Random interval " + this.model.iSupply.demand.actor.name,
+        name: "Gain interval " + this.model.jSupply.demand.actor.name,
         data: [
-          [0, this.model.lowerLoss() * 100],
-          [0, this.equalGain * 100],
-          [0, this.model.upperGainI() * 100]
+          [this.model.upperGainJ(), 0],
+          [this.equalGain, 0]
+        ]
+      },
+      {
+        name: "Loss interval " + this.model.iSupply.demand.actor.name,
+        data: [
+          [0, this.model.lowerLoss()],
+          [0, this.equalGain]
+        ]
+      },
+      {
+        name: "Gain interval " + this.model.iSupply.demand.actor.name,
+        data: [
+          [0, this.model.upperGainI()],
+          [0, this.equalGain]
         ]
       },
       {
         name: "Equal Gain",
         data: [
-          [0, this.equalGain * 100],
-          [this.equalGain * 100, this.equalGain * 100],
-          [this.equalGain * 100, 0]
+          [0, this.equalGain],
+          [this.equalGain, this.equalGain],
+          [this.equalGain, 0]
         ]
       },
       {
         name: "Pareto frontier",
-        data: [
-          [0, this.euMaxI * 100],
-          [this.paretoFrontier[0] * 100, this.paretoFrontier[1] * 100],
-          [this.euMaxJ * 100, 0]
-        ]
+
+        data: this.paretoFrontier
       },
       {
         name: "REX",
-        data: this.model.xyz(100)
+        data: this.model.xyz(1)
       }
     ];
   }

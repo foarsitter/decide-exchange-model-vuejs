@@ -23,3 +23,12 @@ export function exchangeRatioParetoOptimal(exchange: Exchange): number {
     exchange.calcPowerSalience()
   );
 }
+
+export function positionForZero(supply: Exchange, demand: Exchange): number {
+  const delta = demand.Gain() / supply.supply.salience;
+  const mds = supply.MDS() - delta;
+  return (
+    (mds * supply.calcPowerSalience() - supply.demand.calcPowerSalience()) /
+    supply.supply.calcPowerSalience()
+  );
+}
