@@ -8,7 +8,7 @@
       </div>
       <div class="card-content">
         <div class="columns">
-          <div class="column">
+          <div class="column is-one-quarter">
             <table class="table">
               <tr>
                 <td colspan="2">
@@ -95,7 +95,6 @@
               :options="chartOptions"
               :series="series"
               type="line"
-              width="500"
             ></apexchart>
           </div>
         </div>
@@ -149,6 +148,14 @@ export default class ResultsComponent extends Vue {
       stroke: {
         curve: "straight",
         width: 1
+      },
+      xaxis: {
+        decimalsInFloat: 0,
+        title: { text: this.model.iSupply.supply.actor.name }
+      },
+      yaxis: {
+        decimalsInFloat: 0,
+        title: { text: this.model.jSupply.supply.actor.name }
       }
     };
   }

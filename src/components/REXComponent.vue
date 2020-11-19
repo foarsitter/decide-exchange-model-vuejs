@@ -11,7 +11,7 @@
         <template #icon>P-value</template>
       </SingleValueSlider>
       <SingleValueSlider v-model="model.rValue">
-        <template #icon>X-value</template>
+        <template #icon>Random value</template>
       </SingleValueSlider>
       <div class="columns">
         <div class="column is-one-fifth">Actor</div>

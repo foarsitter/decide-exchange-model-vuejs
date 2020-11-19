@@ -1,10 +1,10 @@
 <template>
   <section class="section">
     <div class="container">
-      <div class="card">
+      <div class="card has-background-light">
         <header class="card-header">
           <h1 class="card-header-title">
-            <slot name="title"></slot>
+            <slot name="title"></slot> [Equal Gain]
           </h1>
         </header>
         <div class="card-content">
