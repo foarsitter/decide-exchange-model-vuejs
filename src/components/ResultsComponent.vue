@@ -8,88 +8,88 @@
       </div>
       <div class="card-content">
         <div class="columns">
-          <div class="column is-one-quarter">
-            <table class="table">
-              <tr>
-                <td colspan="2">
-                  Exchange ratio
-                </td>
-              </tr>
-              <tr>
-                <td>{{ model.paretoOptimalExchange.issue }}</td>
-                <td>{{ exchangeRatioP.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>{{ model.partialShiftExchange.issue }}</td>
-                <td>{{ exchangeRatioQ.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  Utility
-                </td>
-              </tr>
-              <tr>
-                <td>Equal Gain</td>
-                <td>{{ equalGain.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>{{ model.iSupply.supply.actor.name }}</td>
-                <td>{{ eui.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>{{ model.jSupply.supply.actor.name }}</td>
-                <td>{{ euj.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  Max Utility
-                </td>
-              </tr>
-              <tr>
-                <td>{{ model.iSupply.supply.actor.name }}</td>
-                <td>
-                  {{ euMaxI.toFixed(4) }}
-                </td>
-              </tr>
-              <tr>
-                <td>{{ model.jSupply.supply.actor.name }}</td>
-                <td>
-                  {{ euMaxJ.toFixed(4) }}
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  Loss / Gain
-                </td>
-              </tr>
-              <tr>
-                <td>{{ model.iSupply.supply.actor.name }}</td>
-                <td>
-                  <table>
-                    <tr>
-                      <td>- {{ supplyLossI.toFixed(2) }}</td>
-                      <td>
-                        {{ demandGainI.toFixed(2) }}
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td>{{ model.jSupply.supply.actor.name }}</td>
-                <td>
-                  <table>
-                    <tr>
-                      <td>- {{ supplyLossJ.toFixed(2) }}</td>
-                      <td>
-                        {{ demandGainJ.toFixed(2) }}
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </div>
+          <!--          <div class="column is-one-quarter">-->
+          <!--            <table class="table">-->
+          <!--              <tr>-->
+          <!--                <td colspan="2">-->
+          <!--                  Exchange ratio-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.paretoOptimalExchange.issue }}</td>-->
+          <!--                <td>{{ exchangeRatioP.toFixed(2) }}</td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.partialShiftExchange.issue }}</td>-->
+          <!--                <td>{{ exchangeRatioQ.toFixed(2) }}</td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td colspan="2">-->
+          <!--                  Utility-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>Equal Gain</td>-->
+          <!--                <td>{{ equalGain.toFixed(2) }}</td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.iSupply.supply.actor.name }}</td>-->
+          <!--                <td>{{ eui.toFixed(2) }}</td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.jSupply.supply.actor.name }}</td>-->
+          <!--                <td>{{ euj.toFixed(2) }}</td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td colspan="2">-->
+          <!--                  Max Utility-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.iSupply.supply.actor.name }}</td>-->
+          <!--                <td>-->
+          <!--                  {{ euMaxI.toFixed(4) }}-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.jSupply.supply.actor.name }}</td>-->
+          <!--                <td>-->
+          <!--                  {{ euMaxJ.toFixed(4) }}-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td colspan="2">-->
+          <!--                  Loss / Gain-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.iSupply.supply.actor.name }}</td>-->
+          <!--                <td>-->
+          <!--                  <table>-->
+          <!--                    <tr>-->
+          <!--                      <td>- {{ supplyLossI.toFixed(2) }}</td>-->
+          <!--                      <td>-->
+          <!--                        {{ demandGainI.toFixed(2) }}-->
+          <!--                      </td>-->
+          <!--                    </tr>-->
+          <!--                  </table>-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--              <tr>-->
+          <!--                <td>{{ model.jSupply.supply.actor.name }}</td>-->
+          <!--                <td>-->
+          <!--                  <table>-->
+          <!--                    <tr>-->
+          <!--                      <td>- {{ supplyLossJ.toFixed(2) }}</td>-->
+          <!--                      <td>-->
+          <!--                        {{ demandGainJ.toFixed(2) }}-->
+          <!--                      </td>-->
+          <!--                    </tr>-->
+          <!--                  </table>-->
+          <!--                </td>-->
+          <!--              </tr>-->
+          <!--            </table>-->
+          <!--          </div>-->
           <div class="column">
             <apexchart
               :options="chartOptions"
