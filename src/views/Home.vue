@@ -4,17 +4,27 @@
     <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
     <Exchange
       v-bind:exchange="p"
-      v-bind:mdsVoting="mdsPVoting"
+      v-bind:mds-voting="mdsPVoting"
+      v-bind:mds-random="mdsRandomP"
       v-bind:voting-position="votingPositionP"
+      v-bind:voting-random="votingRandomP"
       v-bind:move="moveP"
+      v-bind:move-random="moveRandomP"
+      v-bind:exchange-ratio="exchangeRatioP"
+      v-bind:exchange-ratio-random="exchangeRatioRandomP"
     >
       <template #title>{{ p.issue }}</template>
     </Exchange>
     <Exchange
       v-bind:exchange="q"
-      v-bind:mdsVoting="mdsQVoting"
+      v-bind:mds-voting="mdsQVoting"
+      v-bind:mds-random="mdsRandomQ"
       v-bind:voting-position="votingPositionQ"
+      v-bind:voting-random="votingRandomQ"
       v-bind:move="moveQ"
+      v-bind:move-random="moveRandomQ"
+      v-bind:exchange-ratio="exchangeRatioQ"
+      v-bind:exchange-ratio-random="exchangeRatioRandomQ"
     >
       <template #title>{{ q.issue }}</template>
     </Exchange>
@@ -110,7 +120,22 @@ export default class Home extends Vue {
 
   moveP = 0;
   moveQ = 0;
+
+  rexExpectedUtilityI = 0;
+  rexExpectedUtilityJ = 0;
   // actors
+  moveRandomP = 0;
+  moveRandomQ = 0;
+
+  votingRandomP = 0;
+  votingRandomQ = 0;
+
+  mdsRandomP = 0;
+  mdsRandomQ = 0;
+
+  exchangeRatioRandomP = 0;
+  exchangeRatioRandomQ = 0;
+
   @Watch("i.power")
   @Watch("j.power")
   // issue p
@@ -126,8 +151,8 @@ export default class Home extends Vue {
   // model values
   @Watch("model.pValue")
   @Watch("model.rValue")
-  @Watch("model.useActorI")
-  @Watch("model.giveExtraGain")
+  @Watch("model.selectedActor")
+  @Watch("model.extraGainOrLoss")
   dinerChanged() {
     this.update();
   }
@@ -144,6 +169,9 @@ export default class Home extends Vue {
     this.votingPositionP = this.model.p.votingPosition;
     this.votingPositionQ = this.model.q.votingPosition;
 
+    this.moveP = this.p.move;
+    this.moveQ = this.q.move;
+
     this.exchangeRatioP = this.model.calcExchangeRatioP();
     this.exchangeRatioQ = this.model.calcExchangeRatioQ();
 
@@ -155,7 +183,25 @@ export default class Home extends Vue {
 
     this.euMaxI = this.model.euMaxI;
     this.euMaxJ = this.model.euMaxJ;
+
     this.paretoFrontier = this.model.paretoFrontier();
+
+    this.model.randomGain();
+
+    this.eui = this.model.calcExpectedUtilityI();
+    this.euj = this.model.calcExpectedUtilityJ();
+
+    this.moveRandomP = this.p.move;
+    this.moveRandomQ = this.q.move;
+
+    this.votingRandomP = this.p.votingPosition;
+    this.votingRandomQ = this.q.votingPosition;
+
+    this.exchangeRatioRandomP = this.model.calcExchangeRatioP();
+    this.exchangeRatioRandomQ = this.model.calcExchangeRatioQ();
+
+    this.mdsRandomP = this.model.p.MDSVoting();
+    this.mdsRandomQ = this.model.q.MDSVoting();
   }
 
   mounted() {

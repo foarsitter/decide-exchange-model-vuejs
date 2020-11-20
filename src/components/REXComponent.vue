@@ -30,7 +30,7 @@
               ><option value="loss">Less</option>
             </select>
           </div>
-          utility than respectively in the Equal Gain
+          utility than in the Equal Gain
         </div>
       </div>
     </div>

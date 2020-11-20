@@ -28,17 +28,40 @@
                   {{ actorName(index) }} {{ value.toFixed(2) }}
                 </template>
               </vue-slider>
+
               <div class="mt-6 pt-6">
-                <ul>
-                  <li>
-                    {{ exchange.issue }} is the <strong>supply</strong> issue of
-                    <strong>{{ exchange.supply.actor.name }}</strong> and moves
-                    {{ move.toFixed(2) }} to
-                    <strong>{{ votingPosition.toFixed(2) }}</strong>
-                    resulting in a mds of
-                    <strong>{{ mdsVoting.toFixed(2) }}</strong>
-                  </li>
-                </ul>
+                <p>
+                  * Supply issue of
+                  <strong>{{ exchange.supply.actor.name }}</strong>
+                </p>
+
+                <table class="table is-fullwidth">
+                  <tr>
+                    <td class="has-text-left">Model</td>
+                    <td>Exchange Ratio</td>
+                    <td>move</td>
+                    <td>voting position</td>
+                    <td>MDS</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-left">Equal Gain</td>
+                    <td>{{ exchangeRatio.toFixed(2) }}</td>
+                    <td>
+                      {{ move.toFixed(2) }}
+                    </td>
+                    <td>{{ votingPosition.toFixed(2) }}</td>
+                    <td>{{ mdsVoting.toFixed(2) }}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-left">Random Exchange</td>
+                    <td>{{ exchangeRatioRandom.toFixed(2) }}</td>
+                    <td>
+                      {{ moveRandom.toFixed(2) }}
+                    </td>
+                    <td>{{ votingRandom.toFixed(2) }}</td>
+                    <td>{{ mdsRandom.toFixed(2) }}</td>
+                  </tr>
+                </table>
               </div>
             </div>
             <div class="column">
@@ -74,12 +97,20 @@ export default class ExchangeComponent extends Vue {
   exchange!: Exchange;
   @Prop(Number)
   mdsVoting!: number;
-
+  @Prop(Number)
+  mdsRandom!: number;
   @Prop(Number)
   votingPosition!: number;
-
+  @Prop(Number)
+  votingRandom!: number;
   @Prop(Number)
   move!: number;
+  @Prop(Number)
+  moveRandom!: number;
+  @Prop(Number)
+  exchangeRatio!: number;
+  @Prop(Number)
+  exchangeRatioRandom!: number;
 
   actor_issues = [this.exchange.i, this.exchange.j];
 
@@ -87,7 +118,12 @@ export default class ExchangeComponent extends Vue {
     if (index == 2) {
       return "mds";
     }
-    return this.actor_issues[index].actor.name;
+
+    const a = this.actor_issues[index];
+    if (a.exchange?.supply.actor.name == a.actor.name) {
+      return a.actor.name + "*";
+    }
+    return a.actor.name;
   }
 
   get sliderValues() {

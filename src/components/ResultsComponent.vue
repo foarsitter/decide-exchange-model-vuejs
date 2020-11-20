@@ -143,6 +143,12 @@ export default class ResultsComponent extends Vue {
   @Prop(Array)
   paretoFrontier!: number[][];
 
+  @Prop(Number)
+  rexExpectedUtilityI!: number;
+
+  @Prop(Number)
+  rexExpectedUtilityJ!: number;
+
   get chartOptions() {
     return {
       dataLabels: {

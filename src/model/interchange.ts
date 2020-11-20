@@ -205,6 +205,7 @@ export default class Interchange {
     this.negotiate();
 
     if (this.positionForZeroGainI() < this.jDemand.demand.position) {
+      this.euMaxJ;
       this.iSupply.votingPosition = this.iSupply.demand.position;
       this.jSupply.votingPosition = this.jSupply.demand.position;
 
@@ -331,5 +332,41 @@ export default class Interchange {
     } else {
       return this.xyzJ(multiplier);
     }
+  }
+
+  randomGain(): number {
+    const f = this.xyz()[1];
+
+    const utilityI = f[0];
+    const utilityJ = f[1];
+
+    if (this.positionForZeroGainI() < 0) {
+      this.swapParetoOptimalIssue();
+      this.paretoOptimalExchange.move = Math.abs(
+        this.paretoOptimalExchange.demand.position -
+          this.paretoOptimalExchange.supply.position
+      );
+    }
+
+    const lossPartialIssue = this.paretoOptimalExchange.Gain() - utilityJ;
+
+    const deltaMDS =
+      lossPartialIssue / this.partialShiftExchange.supply.salience;
+
+    const newMDS = this.partialShiftExchange.MDS() - deltaMDS;
+
+    const positionPowerSalience =
+      this.partialShiftExchange.demand.calcPositionPowerSalience() +
+      this.partialShiftExchange.supply.calcPowerSalience() *
+        this.partialShiftExchange.demand.position;
+    const voting =
+      (newMDS * this.partialShiftExchange.calcPowerSalience() -
+        positionPowerSalience) /
+      this.partialShiftExchange.supply.salience;
+    this.partialShiftExchange.move =
+      this.partialShiftExchange.supply.position - voting;
+    this.partialShiftExchange.votingPosition = voting;
+
+    return voting;
   }
 }

@@ -142,4 +142,19 @@ describe("interchange.ts", () => {
     expect(x[1][0]).toBeCloseTo(1305.8608058608);
     expect(x[1][1]).toBeCloseTo(79.49);
   });
+
+  it("New exchange", () => {
+    const model = InterchangeFactory();
+
+    model.pValue = 0.9;
+    model.rValue = 1;
+    model.selectedActor = "USA";
+    model.extraGainOrLoss = "gain";
+
+    const x = model.randomGain();
+
+    expect(x).toBeCloseTo(8.02916666666641);
+
+    expect(model.partialShiftExchange.MDSVoting()).toBeCloseTo(3.09);
+  });
 });
