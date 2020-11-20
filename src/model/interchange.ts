@@ -231,46 +231,30 @@ export default class Interchange {
     return positionForZero(this.jSupply, this.jDemand);
   }
 
-  xyz(multiplier = 1): number[][] {
+  xyzI(multiplier = 1): number[][] {
     const r = this.rValue;
     const eu = this.equalGain();
 
     let gain = 0;
 
-    if (this.selectedActor == this.iSupply.demand.actor.name) {
-      if (this.extraGainOrLoss == "gain") {
-        gain = eu + r * (this.upperGainI() - eu);
-      } else {
-        gain = eu - r * (eu - this.lowerLoss());
-      }
+    if (this.extraGainOrLoss == "gain") {
+      gain = eu + r * (this.upperGainI() - eu);
+    } else {
+      gain = eu - r * (eu - this.lowerLoss());
+    }
 
-      const frontier = this.paretoFrontier();
+    const frontier = this.paretoFrontier();
 
-      const y = frontier[1][1];
+    const y = frontier[1][1];
 
-      if (gain < y) {
-        const g = this.jSupply.Loss() + gain;
+    if (gain < y) {
+      const g = this.jSupply.Loss() + gain;
 
-        const delta = g / this.jDemand.demand.salience;
+      const delta = g / this.jDemand.demand.salience;
 
-        const loss = delta * this.jDemand.supply.salience;
+      const loss = delta * this.jDemand.supply.salience;
 
-        const total = Math.abs(loss - this.jSupply.Gain());
-
-        return [
-          [0, gain * multiplier],
-          [total * multiplier, gain * multiplier],
-          [total * multiplier, 0]
-        ];
-      }
-
-      const loss = Math.abs(gain - this.iSupply.Gain());
-
-      const delta = loss / this.iSupply.supply.salience;
-
-      const gainJ = delta * this.jSupply.demand.salience;
-
-      const total = Math.abs(gainJ - this.iSupply.Loss());
+      const total = Math.abs(loss - this.jSupply.Gain());
 
       return [
         [0, gain * multiplier],
@@ -278,6 +262,27 @@ export default class Interchange {
         [total * multiplier, 0]
       ];
     }
+
+    const loss = Math.abs(gain - this.iSupply.Gain());
+
+    const delta = loss / this.iSupply.supply.salience;
+
+    const gainJ = delta * this.jSupply.demand.salience;
+
+    const total = Math.abs(gainJ - this.iSupply.Loss());
+
+    return [
+      [0, gain * multiplier],
+      [total * multiplier, gain * multiplier],
+      [total * multiplier, 0]
+    ];
+  }
+
+  xyzJ(multiplier = 1): number[][] {
+    const r = this.rValue;
+    const eu = this.equalGain();
+
+    let gain = 0;
 
     if (this.extraGainOrLoss == "gain") {
       gain = eu + r * (this.upperGainJ() - eu);
@@ -287,7 +292,7 @@ export default class Interchange {
 
     const frontier = this.paretoFrontier();
 
-    const y = frontier[0][0];
+    const y = frontier[1][0];
 
     if (gain < y) {
       const g = this.iSupply.Loss() + gain;
@@ -299,9 +304,9 @@ export default class Interchange {
       const total = Math.abs(loss - this.iSupply.Gain());
 
       return [
-        [0, gain * multiplier],
-        [total * multiplier, gain * multiplier],
-        [total * multiplier, 0]
+        [gain * multiplier, 0],
+        [gain * multiplier, total * multiplier],
+        [0, total * multiplier]
       ];
     }
 
@@ -314,9 +319,17 @@ export default class Interchange {
     const total = Math.abs(gainJ - this.jSupply.Loss());
 
     return [
-      [0, gain * multiplier],
-      [total * multiplier, gain * multiplier],
-      [total * multiplier, 0]
+      [gain * multiplier, 0],
+      [gain * multiplier, total * multiplier],
+      [0, total * multiplier]
     ];
+  }
+
+  xyz(multiplier = 1): number[][] {
+    if (this.selectedActor == this.iSupply.demand.actor.name) {
+      return this.xyzI(multiplier);
+    } else {
+      return this.xyzJ(multiplier);
+    }
   }
 }

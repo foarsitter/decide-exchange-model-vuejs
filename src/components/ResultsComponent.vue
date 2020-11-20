@@ -165,7 +165,12 @@ export default class ResultsComponent extends Vue {
           }
 
           if (x != 0) {
-            return y + "; " + x;
+            if (seriesIndex == 5) {
+              return y + "; " + x;
+            }
+            {
+              return "";
+            }
           }
 
           return Math.round(val * 100) / 100;

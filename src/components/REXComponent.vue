@@ -16,17 +16,21 @@
       <div class="columns">
         <div class="column is-one-fifth">Actor & Gain/Loss</div>
         <div class="column has-text-left">
-          Use
-          <select class="select" v-model="model.selectedActor"
-            ><option>{{ model.iSupply.supply.actor.name }}</option
-            ><option>{{ model.jSupply.supply.actor.name }}</option></select
-          >
-          as actor to calculate a simulation where {{ model.selectedActor }} has
-          <select class="select" v-model="model.extraGainOrLoss"
-            ><option value="gain">More</option
-            ><option value="loss">Less</option>
-          </select>
-          utility then in the case of Equal Gain
+          We chooise
+          <div class="select">
+            <select v-model="model.selectedActor"
+              ><option>{{ model.iSupply.supply.actor.name }}</option
+              ><option>{{ model.jSupply.supply.actor.name }}</option></select
+            >
+          </div>
+          randomly to calculate
+          <div class="select">
+            <select class="select" v-model="model.extraGainOrLoss"
+              ><option value="gain">More</option
+              ><option value="loss">Less</option>
+            </select>
+          </div>
+          utility than respectively in the Equal Gain
         </div>
       </div>
     </div>

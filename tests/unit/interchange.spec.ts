@@ -101,7 +101,7 @@ describe("interchange.ts", () => {
     expect(x[1]).toBeCloseTo(1378.21);
   });
 
-  it("new expected utilty (p=0.9, r=1)", () => {
+  it("USA new expected utilty (p=0.9, r=1)", () => {
     const model = InterchangeFactory();
 
     model.pValue = 0.9;
@@ -115,7 +115,7 @@ describe("interchange.ts", () => {
     expect(x[1][1]).toBeCloseTo(1532.61);
   });
 
-  it("new expected utilty (p=0.9, r=0.5)", () => {
+  it("USA new expected utilty (p=0.9, r=0.5)", () => {
     const model = InterchangeFactory();
 
     model.pValue = 0.9;
@@ -128,9 +128,18 @@ describe("interchange.ts", () => {
     expect(x[1][0]).toBeCloseTo(531.39);
     expect(x[1][1]).toBeCloseTo(1163.74);
   });
-  it("zero gain I", () => {
+
+  it("China new expected utilty (p=0.9, r=1)", () => {
     const model = InterchangeFactory();
 
-    expect(model.positionForZeroGainI()).toBeCloseTo(-19.5538461538462);
+    model.pValue = 0.9;
+    model.rValue = 1;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "gain";
+
+    const x = model.xyz();
+
+    expect(x[1][0]).toBeCloseTo(1305.8608058608);
+    expect(x[1][1]).toBeCloseTo(79.49);
   });
 });
