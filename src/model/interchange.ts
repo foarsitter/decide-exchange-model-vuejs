@@ -12,7 +12,7 @@ export default class Interchange {
 
   pValue = 0.9;
   rValue = 1;
-  selectedActor = "";
+  selectedActor = "China";
   extraGainOrLoss = "";
 
   constructor(p: Exchange, q: Exchange) {
@@ -26,7 +26,7 @@ export default class Interchange {
     this.partialShiftExchange = this.q;
 
     this.extraGainOrLoss = "gain";
-    this.selectedActor = this.p.supply.actor.name;
+    this.selectedActor = this.p.demand.actor.name;
 
     this.calcSupplyDemandIssue();
   }
@@ -304,7 +304,7 @@ export default class Interchange {
     const r = this.rValue;
     const eu = this.equalGain();
 
-    let utility = 0;
+    let utility;
 
     if (this.extraGainOrLoss == "gain") {
       utility = eu + r * (this.upperGainI() - eu);
@@ -316,23 +316,45 @@ export default class Interchange {
 
     const y = frontier[1][1];
 
-    if (utility > y && frontier.length == 3) {
-      console.log("I2");
-      this.swapParetoOptimalIssue();
-      const loss = this.paretoOptimalExchange.Gain() - utility;
+    if (frontier.length == 3) {
+      if (utility > y) {
+        if (y < eu) {
+          this.swapParetoOptimalIssue();
+        }
 
-      const delta = loss / this.partialShiftExchange.supply.salience;
+        this.swapParetoOptimalIssue();
 
-      const gain = delta * this.partialShiftExchange.demand.salience;
+        const loss = this.paretoOptimalExchange.Gain() - utility;
 
-      const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
-      // const total = 210;
+        const delta = loss / this.partialShiftExchange.supply.salience;
 
-      return [
-        [0, utility * multiplier],
-        [total * multiplier, utility * multiplier],
-        [total * multiplier, 0]
-      ];
+        const gain = delta * this.partialShiftExchange.demand.salience;
+
+        const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
+
+        return [
+          [0, utility * multiplier],
+          [total * multiplier, utility * multiplier],
+          [total * multiplier, 0]
+        ];
+      } else {
+        console.log("I3");
+
+        const gain = this.paretoOptimalExchange.Loss() + utility;
+
+        const delta = gain / this.partialShiftExchange.demand.salience;
+
+        const loss = delta * this.partialShiftExchange.supply.salience;
+
+        const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
+        // const total = 210;
+
+        return [
+          [0, utility * multiplier],
+          [total * multiplier, utility * multiplier],
+          [total * multiplier, 0]
+        ];
+      }
     }
     console.log("I1");
 
@@ -365,15 +387,20 @@ export default class Interchange {
 
     const frontier = this.paretoFrontier();
 
-    const y = frontier[1][1];
+    const x = frontier[1][0];
 
-    if (utility > y && frontier.length == 3) {
+    if (frontier.length == 3) {
       console.log("J2");
+
+      if (x > eu) {
+        this.swapParetoOptimalIssue();
+      }
+
       const loss = this.paretoOptimalExchange.Gain() - utility;
 
-      const delta = loss / this.partialShiftExchange.demand.salience;
+      const delta = loss / this.partialShiftExchange.supply.salience;
 
-      const gain = delta * this.partialShiftExchange.supply.salience;
+      const gain = delta * this.partialShiftExchange.demand.salience;
 
       const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
 
@@ -383,6 +410,7 @@ export default class Interchange {
         [0, total * multiplier]
       ];
     }
+    console.log("J1");
 
     const gain = Math.abs(this.paretoOptimalExchange.Loss() + utility);
 
