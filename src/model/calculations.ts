@@ -9,7 +9,7 @@ export function maxExpectedUtility(supply: Exchange, demand: Exchange): number {
 
   const delta1 = loss / (demand.demand.salience * s);
 
-  // const delta2 = gain / (s * supply.supply.salience);
+  // const delta2 = gain.ts / (s * supply.supply.salience);
 
   // const x = s * demand.demand.salience * delta2 - loss;
 

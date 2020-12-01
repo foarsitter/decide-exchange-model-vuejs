@@ -5,19 +5,59 @@ import Exchange from "@/model/exchange";
 
 function InterchangeFactory(): Interchange {
   // i in the excel sheet
-  const i = new Actor("China", 1);
-  const j = new Actor("USA", 1);
+  const china = new Actor("China", 1);
+  const usa = new Actor("USA", 1);
 
   const p = new Exchange(
     "fin vol",
-    new ActorIssue(i, 100, 50),
-    new ActorIssue(j, 0, 70)
+    new ActorIssue(china, 100, 50),
+    new ActorIssue(usa, 0, 70)
   );
 
   const q = new Exchange(
     "fin who",
-    new ActorIssue(i, 0, 80),
-    new ActorIssue(j, 80, 50)
+    new ActorIssue(china, 0, 80),
+    new ActorIssue(usa, 80, 50)
+  );
+
+  return new Interchange(p, q);
+}
+
+function InterchangeFactoryInverted(): Interchange {
+  // i in the excel sheet
+  const china = new Actor("China", 1);
+  const usa = new Actor("USA", 1);
+
+  const q = new Exchange(
+    "fin vol",
+    new ActorIssue(usa, 0, 70),
+    new ActorIssue(china, 100, 50)
+  );
+
+  const p = new Exchange(
+    "fin who",
+    new ActorIssue(usa, 80, 50),
+    new ActorIssue(china, 0, 80)
+  );
+
+  return new Interchange(p, q);
+}
+
+function InterchangeFactory2(): Interchange {
+  // i in the excel sheet
+  const brazil = new Actor("Brazil", 0.5);
+  const usa = new Actor("USA", 0.5);
+
+  const p = new Exchange(
+    "LD",
+    new ActorIssue(brazil, 0, 10),
+    new ActorIssue(usa, 100, 60)
+  );
+
+  const q = new Exchange(
+    "fin who",
+    new ActorIssue(brazil, 0, 90),
+    new ActorIssue(usa, 100, 50)
   );
 
   return new Interchange(p, q);
@@ -86,16 +126,16 @@ describe("interchange.ts", () => {
   it("maximum expected utlity", () => {
     const model = InterchangeFactory();
 
-    model.iSupply.votingPosition = model.iSupply.demand.position;
-    model.jSupply.votingPosition = model.jSupply.demand.position;
+    // model.iSupply.votingPosition = model.iSupply.demand.position;
+    // model.jSupply.votingPosition = model.jSupply.demand.position;
 
-    expect(model.euMaxJ).toBeCloseTo(1362.63736263736);
     expect(model.euMaxI).toBeCloseTo(1614.58);
+    expect(model.euMaxJ).toBeCloseTo(1362.63736263736);
   });
   it("pareto frontier", () => {
     const model = InterchangeFactory();
 
-    const x = model.paretoFrontier();
+    const x = model.paretoFrontier()[1];
 
     expect(x[0]).toBeCloseTo(378.21);
     expect(x[1]).toBeCloseTo(1378.21);
@@ -156,5 +196,52 @@ describe("interchange.ts", () => {
     expect(x).toBeCloseTo(8.02916666666641);
 
     expect(model.partialShiftExchange.MDSVoting()).toBeCloseTo(3.09);
+  });
+
+  it("Maximal utility 2", () => {
+    const model = InterchangeFactory2();
+    model.equalGain();
+
+    expect(model.zeroUtilityI()).toBeCloseTo(1400);
+    expect(model.zeroUtilityJ()).toBeCloseTo(777.7777);
+
+    expect(model.zeroUtilityIPosition()).toBeCloseTo(50.2);
+    expect(model.zeroUtilityJPosition()).toBeCloseTo(93.7555555555555);
+  });
+
+  it("Maximal utility 2 for x", () => {
+    const model = InterchangeFactory2();
+
+    model.pValue = 0.9;
+    model.rValue = 1;
+    model.selectedActor = "USA";
+    model.extraGainOrLoss = "gain";
+
+    const x = model.xyz();
+
+    const utilityI = x[0][1];
+    const utilityJ = x[2][0];
+
+    expect(utilityI).toBeCloseTo(1310);
+    expect(utilityJ).toBeCloseTo(50);
+  });
+
+  it("Maximal utility", () => {
+    const model = InterchangeFactory();
+    model.equalGain();
+
+    expect(model.zeroUtilityI()).toBeCloseTo(1907.69);
+    expect(model.euMaxI).toBeCloseTo(1614.5833333);
+    expect(model.zeroUtilityJ()).toBeCloseTo(1362.63736263736);
+    expect(model.zeroUtilityJ()).toBeCloseTo(model.euMaxJ);
+  });
+
+  it("Maximal utility inverted", () => {
+    const model = InterchangeFactoryInverted();
+    model.equalGain();
+
+    expect(model.zeroUtilityI()).toBeCloseTo(1907.69);
+    expect(model.zeroUtilityIPosition()).toBeCloseTo(-19.5538461538462);
+    expect(model.zeroUtilityJ()).toBeCloseTo(1362.64);
   });
 });

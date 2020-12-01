@@ -51,7 +51,7 @@ export default class Exchange {
   }
 
   MDSDelta(): number {
-    return this.MDS() - this.MDSVoting();
+    return Math.abs(this.MDS() - this.MDSVoting());
   }
 
   applyMove(): void {
