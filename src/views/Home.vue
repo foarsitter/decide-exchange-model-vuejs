@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <!--    <ConfigTable v-bind:model="model"></ConfigTable>-->
+    <ConfigTable v-bind:model="model"></ConfigTable>
     <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
     <Exchange
       v-bind:exchange="p"
