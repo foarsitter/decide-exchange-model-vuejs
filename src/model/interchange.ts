@@ -317,12 +317,10 @@ export default class Interchange {
     const y = frontier[1][1];
 
     if (frontier.length == 3) {
-      if (utility > y) {
-        if (y < eu) {
+      if (this.extraGainOrLoss == "gain") {
+        if (y > eu) {
           this.swapParetoOptimalIssue();
         }
-
-        this.swapParetoOptimalIssue();
 
         const loss = this.paretoOptimalExchange.Gain() - utility;
 
@@ -338,6 +336,9 @@ export default class Interchange {
           [total * multiplier, 0]
         ];
       } else {
+        if (y < eu) {
+          this.swapParetoOptimalIssue();
+        }
         console.log("I3");
 
         const gain = this.paretoOptimalExchange.Loss() + utility;
@@ -390,27 +391,27 @@ export default class Interchange {
     const x = frontier[1][0];
 
     if (frontier.length == 3) {
-      console.log("J2");
+      if (this.extraGainOrLoss == "gain") {
+        if (x > eu) {
+          console.log("xyzJ gt eu");
+          this.swapParetoOptimalIssue();
+        }
 
-      if (x > eu) {
-        this.swapParetoOptimalIssue();
+        const loss = this.paretoOptimalExchange.Gain() - utility;
+
+        const delta = loss / this.partialShiftExchange.supply.salience;
+
+        const gain = delta * this.partialShiftExchange.demand.salience;
+
+        const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
+
+        return [
+          [utility * multiplier, 0],
+          [utility * multiplier, total * multiplier],
+          [0, total * multiplier]
+        ];
       }
-
-      const loss = this.paretoOptimalExchange.Gain() - utility;
-
-      const delta = loss / this.partialShiftExchange.supply.salience;
-
-      const gain = delta * this.partialShiftExchange.demand.salience;
-
-      const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
-
-      return [
-        [utility * multiplier, 0],
-        [utility * multiplier, total * multiplier],
-        [0, total * multiplier]
-      ];
     }
-    console.log("J1");
 
     const gain = Math.abs(this.paretoOptimalExchange.Loss() + utility);
 

@@ -74,7 +74,7 @@ export default class Home extends Vue {
   dirty = false;
 
   // i in the excel sheet
-  i = new Actor("China", 1);
+  i = new Actor("China", 0.8);
   j = new Actor("USA", 1);
 
   p = new Exchange(
