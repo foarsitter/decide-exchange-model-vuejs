@@ -74,18 +74,18 @@ export default class Home extends Vue {
   dirty = false;
 
   // i in the excel sheet
-  i = new Actor("China", 0.8);
+  i = new Actor("Brazil", 0.7);
   j = new Actor("USA", 1);
 
   p = new Exchange(
-    "fin vol",
-    new ActorIssue(this.i, 100, 0.5),
-    new ActorIssue(this.j, 0, 0.7)
+    "L&D",
+    new ActorIssue(this.i, 50, 0.55),
+    new ActorIssue(this.j, 0, 0.9)
   );
 
   q = new Exchange(
-    "fin who",
-    new ActorIssue(this.i, 0, 0.8),
+    "Who Pays",
+    new ActorIssue(this.i, 0, 0.7),
     new ActorIssue(this.j, 80, 0.5)
   );
   model = new Interchange(this.p, this.q);
