@@ -10,9 +10,9 @@ export default class Interchange {
   paretoOptimalExchange: Exchange;
   partialShiftExchange: Exchange;
 
-  pValue = 0.9;
-  rValue = 1;
-  selectedActor = "China";
+  pValue = 0.8;
+  rValue = 0.75;
+  selectedActor = "USA";
   extraGainOrLoss = "";
 
   constructor(p: Exchange, q: Exchange) {
@@ -26,7 +26,7 @@ export default class Interchange {
     this.partialShiftExchange = this.q;
 
     this.extraGainOrLoss = "gain";
-    this.selectedActor = this.p.demand.actor.name;
+    this.selectedActor = this.p.supply.actor.name;
 
     this.calcSupplyDemandIssue();
   }
