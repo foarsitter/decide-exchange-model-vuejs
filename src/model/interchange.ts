@@ -10,10 +10,10 @@ export default class Interchange {
   paretoOptimalExchange: Exchange;
   partialShiftExchange: Exchange;
 
-  pValue = 0.8;
-  rValue = 0.75;
-  selectedActor = "USA";
-  extraGainOrLoss = "";
+  pValue = 0.9;
+  rValue = 0.5;
+  selectedActor = "";
+  extraGainOrLoss = "loss";
 
   constructor(p: Exchange, q: Exchange) {
     this.p = p;
@@ -25,8 +25,7 @@ export default class Interchange {
     this.paretoOptimalExchange = this.p;
     this.partialShiftExchange = this.q;
 
-    this.extraGainOrLoss = "gain";
-    this.selectedActor = this.p.supply.actor.name;
+    this.selectedActor = this.p.demand.actor.name;
 
     this.calcSupplyDemandIssue();
   }
@@ -318,28 +317,23 @@ export default class Interchange {
 
     if (frontier.length == 3) {
       if (this.extraGainOrLoss == "gain") {
-        if (y > eu) {
+        if (y < utility) {
           this.swapParetoOptimalIssue();
+
+          const loss = this.paretoOptimalExchange.Gain() - utility;
+
+          const delta = loss / this.partialShiftExchange.supply.salience;
+
+          const gain = delta * this.partialShiftExchange.demand.salience;
+
+          const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
+
+          return [
+            [0, utility * multiplier],
+            [total * multiplier, utility * multiplier],
+            [total * multiplier, 0]
+          ];
         }
-
-        const loss = this.paretoOptimalExchange.Gain() - utility;
-
-        const delta = loss / this.partialShiftExchange.supply.salience;
-
-        const gain = delta * this.partialShiftExchange.demand.salience;
-
-        const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
-
-        return [
-          [0, utility * multiplier],
-          [total * multiplier, utility * multiplier],
-          [total * multiplier, 0]
-        ];
-      } else {
-        if (y < eu) {
-          this.swapParetoOptimalIssue();
-        }
-        console.log("I3");
 
         const gain = this.paretoOptimalExchange.Loss() + utility;
 
@@ -348,7 +342,24 @@ export default class Interchange {
         const loss = delta * this.partialShiftExchange.supply.salience;
 
         const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
-        // const total = 210;
+
+        return [
+          [0, utility * multiplier],
+          [total * multiplier, utility * multiplier],
+          [total * multiplier, 0]
+        ];
+      } else {
+        if (y < utility) {
+          this.swapParetoOptimalIssue();
+        }
+
+        const gain = this.paretoOptimalExchange.Loss() + utility;
+
+        const delta = gain / this.partialShiftExchange.demand.salience;
+
+        const loss = delta * this.partialShiftExchange.supply.salience;
+
+        const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
 
         return [
           [0, utility * multiplier],
@@ -357,7 +368,6 @@ export default class Interchange {
         ];
       }
     }
-    console.log("I1");
 
     const gain = Math.abs(this.paretoOptimalExchange.Loss() + utility);
 
@@ -392,9 +402,54 @@ export default class Interchange {
 
     if (frontier.length == 3) {
       if (this.extraGainOrLoss == "gain") {
-        if (x > eu) {
-          console.log("xyzJ gt eu");
+        if (x > utility) {
           this.swapParetoOptimalIssue();
+
+          const gain = this.paretoOptimalExchange.Loss() + utility;
+
+          const delta = gain / this.partialShiftExchange.demand.salience;
+
+          const loss = delta * this.partialShiftExchange.supply.salience;
+
+          const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
+
+          return [
+            [utility * multiplier, 0],
+            [utility * multiplier, total * multiplier],
+            [0, total * multiplier]
+          ];
+        }
+
+        const loss = this.paretoOptimalExchange.Gain() - utility;
+
+        const delta = loss / this.partialShiftExchange.supply.salience;
+
+        const gain = delta * this.partialShiftExchange.demand.salience;
+
+        const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
+
+        return [
+          [utility * multiplier, 0],
+          [utility * multiplier, total * multiplier],
+          [0, total * multiplier]
+        ];
+      } else {
+        if (x > utility) {
+          this.swapParetoOptimalIssue();
+
+          const gain = this.paretoOptimalExchange.Loss() + utility;
+
+          const delta = gain / this.partialShiftExchange.demand.salience;
+
+          const loss = delta * this.partialShiftExchange.supply.salience;
+
+          const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
+
+          return [
+            [utility * multiplier, 0],
+            [utility * multiplier, total * multiplier],
+            [0, total * multiplier]
+          ];
         }
 
         const loss = this.paretoOptimalExchange.Gain() - utility;
@@ -413,13 +468,13 @@ export default class Interchange {
       }
     }
 
-    const gain = Math.abs(this.paretoOptimalExchange.Loss() + utility);
+    const loss = this.paretoOptimalExchange.Gain() - utility;
 
-    const delta = gain / this.partialShiftExchange.demand.salience;
+    const delta = loss / this.partialShiftExchange.supply.salience;
 
-    const loss = delta * this.partialShiftExchange.supply.salience;
+    const gain = delta * this.partialShiftExchange.demand.salience;
 
-    const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
+    const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
 
     return [
       [utility * multiplier, 0],
@@ -465,8 +520,10 @@ export default class Interchange {
       (newMDS * this.partialShiftExchange.calcPowerSalience() -
         positionPowerSalience) /
       this.partialShiftExchange.supply.salience;
+
     this.partialShiftExchange.move =
       this.partialShiftExchange.supply.position - voting;
+
     this.partialShiftExchange.votingPosition = voting;
 
     return voting;

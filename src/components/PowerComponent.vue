@@ -1,24 +1,18 @@
 <template>
   <section class="section" id="power">
-    <div class="container">
-      <div class="card">
-        <header class="card-header">
-          <h1 class="card-header-title">
-            Power
-          </h1>
-        </header>
-        <div class="card-content">
-          <SingleValueSlider v-model="rabbit.power"
-            ><template v-slot:icon>{{
-              rabbit.name
-            }}</template></SingleValueSlider
-          >
-          <SingleValueSlider v-model="turtle.power"
-            ><template v-slot:icon>{{
-              turtle.name
-            }}</template></SingleValueSlider
-          >
-        </div>
+    <div class="card">
+      <header class="card-header">
+        <h1 class="card-header-title">
+          Power
+        </h1>
+      </header>
+      <div class="card-content">
+        <SingleValueSlider v-model="rabbit.power"
+          ><template v-slot:icon>{{ rabbit.name }}</template></SingleValueSlider
+        >
+        <SingleValueSlider v-model="turtle.power"
+          ><template v-slot:icon>{{ turtle.name }}</template></SingleValueSlider
+        >
       </div>
     </div>
   </section>

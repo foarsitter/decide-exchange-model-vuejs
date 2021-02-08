@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container is-fluid">
     <ConfigTable v-bind:model="model"></ConfigTable>
     <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
     <Exchange
@@ -74,18 +74,18 @@ export default class Home extends Vue {
   dirty = false;
 
   // i in the excel sheet
-  i = new Actor("Brazil", 0.7);
-  j = new Actor("USA", 1);
+  i = new Actor("China", 0.6);
+  j = new Actor("USA", 0.5);
 
   p = new Exchange(
-    "L&D",
-    new ActorIssue(this.i, 50, 0.55),
-    new ActorIssue(this.j, 0, 0.9)
+    "Fin Vol",
+    new ActorIssue(this.i, 100, 0.5),
+    new ActorIssue(this.j, 0, 0.7)
   );
 
   q = new Exchange(
-    "Who Pays",
-    new ActorIssue(this.i, 0, 0.7),
+    "Fin Who",
+    new ActorIssue(this.i, 0, 0.8),
     new ActorIssue(this.j, 80, 0.5)
   );
   model = new Interchange(this.p, this.q);

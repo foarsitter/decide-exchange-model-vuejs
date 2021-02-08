@@ -155,7 +155,7 @@ describe("interchange.ts", () => {
     expect(x[1][1]).toBeCloseTo(1532.61);
   });
 
-  it("USA new expected utilty (p=0.9, r=0.5)", () => {
+  it("Extra gain for USA (p=0.9, r=0.5)", () => {
     const model = InterchangeFactory();
 
     model.pValue = 0.9;
@@ -169,7 +169,21 @@ describe("interchange.ts", () => {
     expect(x[1][1]).toBeCloseTo(1163.74);
   });
 
-  it("China new expected utilty (p=0.9, r=1)", () => {
+  it("Extra loss for China (p=0.9, r=0.5)", () => {
+    const model = InterchangeFactory();
+
+    model.pValue = 0.9;
+    model.rValue = 0.5;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "loss";
+
+    const x = model.xyz();
+
+    expect(x[1][0]).toBeCloseTo(437.179);
+    expect(x[1][1]).toBeCloseTo(1295.64);
+  });
+
+  it("China extra expected utilty (p=0.9, r=1)", () => {
     const model = InterchangeFactory();
 
     model.pValue = 0.9;
@@ -183,6 +197,19 @@ describe("interchange.ts", () => {
     expect(x[1][1]).toBeCloseTo(79.49);
   });
 
+  it("China less expected utilty (p=0.9, r=1)", () => {
+    const model = InterchangeFactory();
+
+    model.pValue = 0.9;
+    model.rValue = 1;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "less";
+
+    const x = model.xyz();
+
+    expect(x[1][0]).toBeCloseTo(79.49);
+    expect(x[1][1]).toBeCloseTo(1564.903);
+  });
   it("New exchange", () => {
     const model = InterchangeFactory();
 
@@ -193,9 +220,11 @@ describe("interchange.ts", () => {
 
     const x = model.randomGain();
 
-    expect(x).toBeCloseTo(8.02916666666641);
+    expect(x).toBeCloseTo(55.41153846153845);
 
-    expect(model.partialShiftExchange.MDSVoting()).toBeCloseTo(3.09);
+    expect(model.partialShiftExchange.MDSVoting()).toBeCloseTo(
+      23.08814102564102
+    );
   });
 
   it("Maximal utility 2", () => {
