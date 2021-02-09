@@ -3,7 +3,7 @@
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">
-          Data
+          Data (versie 1.0)
         </p>
         <a class="card-header-icon card-toggle">
           x
