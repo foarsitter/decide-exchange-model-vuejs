@@ -1,5 +1,6 @@
 <template>
   <div class="container is-fluid">
+    <p>url: https://decide-exchange-model.netlify.app/#/model/{{ url }}</p>
     <div class="columns">
       <div class="column">
         <ConfigTable v-bind:model="model"></ConfigTable>
@@ -142,6 +143,8 @@ export default class Home extends Vue {
   exchangeRatioRandomP = 0;
   exchangeRatioRandomQ = 0;
 
+  url = "";
+
   @Watch("i.name")
   @Watch("j.name")
   @Watch("i.power")
@@ -196,6 +199,7 @@ export default class Home extends Vue {
 
       if (this.$route.params["q"] != compressed) {
         console.log(compressed);
+        this.url = compressed;
         this.$router.push({ name: "Home", params: { q: compressed } });
       }
     }
