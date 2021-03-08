@@ -1,49 +1,55 @@
 <template>
   <div class="container is-fluid">
-    <ConfigTable v-bind:model="model"></ConfigTable>
-    <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
-    <Exchange
-      v-bind:exchange="p"
-      v-bind:mds-voting="mdsPVoting"
-      v-bind:mds-random="mdsRandomP"
-      v-bind:voting-position="votingPositionP"
-      v-bind:voting-random="votingRandomP"
-      v-bind:move="moveP"
-      v-bind:move-random="moveRandomP"
-      v-bind:exchange-ratio="exchangeRatioP"
-      v-bind:exchange-ratio-random="exchangeRatioRandomP"
-    >
-      <template #title>{{ p.issue }}</template>
-    </Exchange>
-    <Exchange
-      v-bind:exchange="q"
-      v-bind:mds-voting="mdsQVoting"
-      v-bind:mds-random="mdsRandomQ"
-      v-bind:voting-position="votingPositionQ"
-      v-bind:voting-random="votingRandomQ"
-      v-bind:move="moveQ"
-      v-bind:move-random="moveRandomQ"
-      v-bind:exchange-ratio="exchangeRatioQ"
-      v-bind:exchange-ratio-random="exchangeRatioRandomQ"
-    >
-      <template #title>{{ q.issue }}</template>
-    </Exchange>
-    <REXComponent v-bind:model="model"></REXComponent>
-    <ResultsComponent
-      v-bind:model="model"
-      v-bind:eui="eui"
-      v-bind:euj="euj"
-      v-bind:exchangeRatioQ="exchangeRatioQ"
-      v-bind:exchangeRatioP="exchangeRatioP"
-      v-bind:equal-gain="equalGain"
-      v-bind:eu-max-i="euMaxI"
-      v-bind:eu-max-j="euMaxJ"
-      v-bind:supply-loss-i="supplyLossI"
-      v-bind:supply-loss-j="supplyLossJ"
-      v-bind:demand-gain-i="demandGainI"
-      v-bind:demand-gain-j="demandGainJ"
-      v-bind:pareto-frontier="paretoFrontier"
-    ></ResultsComponent>
+    <div class="columns">
+      <div class="column">
+        <ConfigTable v-bind:model="model"></ConfigTable>
+        <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
+        <Exchange
+          v-bind:exchange="p"
+          v-bind:mds-voting="mdsPVoting"
+          v-bind:mds-random="mdsRandomP"
+          v-bind:voting-position="votingPositionP"
+          v-bind:voting-random="votingRandomP"
+          v-bind:move="moveP"
+          v-bind:move-random="moveRandomP"
+          v-bind:exchange-ratio="exchangeRatioP"
+          v-bind:exchange-ratio-random="exchangeRatioRandomP"
+        >
+          <template #title>{{ p.issue }}</template>
+        </Exchange>
+        <Exchange
+          v-bind:exchange="q"
+          v-bind:mds-voting="mdsQVoting"
+          v-bind:mds-random="mdsRandomQ"
+          v-bind:voting-position="votingPositionQ"
+          v-bind:voting-random="votingRandomQ"
+          v-bind:move="moveQ"
+          v-bind:move-random="moveRandomQ"
+          v-bind:exchange-ratio="exchangeRatioQ"
+          v-bind:exchange-ratio-random="exchangeRatioRandomQ"
+        >
+          <template #title>{{ q.issue }}</template>
+        </Exchange>
+      </div>
+      <div class="column">
+        <REXComponent v-bind:model="model"></REXComponent>
+        <ResultsComponent
+          v-bind:model="model"
+          v-bind:eui="eui"
+          v-bind:euj="euj"
+          v-bind:exchangeRatioQ="exchangeRatioQ"
+          v-bind:exchangeRatioP="exchangeRatioP"
+          v-bind:equal-gain="equalGain"
+          v-bind:eu-max-i="euMaxI"
+          v-bind:eu-max-j="euMaxJ"
+          v-bind:supply-loss-i="supplyLossI"
+          v-bind:supply-loss-j="supplyLossJ"
+          v-bind:demand-gain-i="demandGainI"
+          v-bind:demand-gain-j="demandGainJ"
+          v-bind:pareto-frontier="paretoFrontier"
+        ></ResultsComponent>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -59,6 +65,7 @@ import Interchange from "@/model/interchange";
 import VueApexCharts from "vue-apexcharts";
 import ResultsComponent from "@/components/ResultsComponent.vue";
 import REXComponent from "@/components/REXComponent.vue";
+import { compressToBase64, decompressFromBase64 } from "lz-string";
 
 @Component({
   components: {
@@ -74,13 +81,13 @@ export default class Home extends Vue {
   dirty = false;
 
   // i in the excel sheet
-  i = new Actor("China", 1);
+  i = new Actor("China", 0.85);
   j = new Actor("USA", 1);
 
   p = new Exchange(
     "Fin Vol",
     new ActorIssue(this.i, 100, 0.5),
-    new ActorIssue(this.j, 0, 0.7)
+    new ActorIssue(this.j, 0, 0.3)
   );
 
   q = new Exchange(
@@ -136,6 +143,8 @@ export default class Home extends Vue {
   exchangeRatioRandomP = 0;
   exchangeRatioRandomQ = 0;
 
+  @Watch("i.name")
+  @Watch("j.name")
   @Watch("i.power")
   @Watch("j.power")
   // issue p
@@ -154,12 +163,51 @@ export default class Home extends Vue {
   @Watch("model.selectedActor")
   @Watch("model.extraGainOrLoss")
   dinerChanged() {
-    this.update();
+    if (!this.dirty) {
+      this.dirty = true;
+      this.update(true);
+      this.dirty = false;
+    }
   }
 
-  update() {
-    console.log("Update");
+  update(redirect: boolean) {
+    if (redirect) {
+      const objects = [];
+      objects.push("v1");
+      objects.push(this.model.iSupply.supply.actor.name);
+      objects.push(this.model.jSupply.supply.actor.name);
+      objects.push(this.model.iSupply.supply.exchange?.issue);
+      objects.push(this.model.jSupply.supply.exchange?.issue);
+      objects.push(this.model.iSupply.supply.actor.power);
+      objects.push(this.model.jSupply.supply.actor.power);
+
+      objects.push(this.model.iSupply.supply.salience);
+      objects.push(this.model.iSupply.supply.position);
+
+      objects.push(this.model.jSupply.supply.salience);
+      objects.push(this.model.jSupply.supply.position);
+
+      objects.push(this.model.rValue);
+      objects.push(this.model.pValue);
+
+      objects.push(this.model.selectedActor);
+      objects.push(this.model.extraGainOrLoss);
+
+      const str = objects.join("|");
+
+      const compressed = str; //compressToBase64(str);
+
+      if (this.$route.params["q"] != compressed) {
+        console.log(compressed);
+        this.$router.push({ name: "Home", params: { q: compressed } });
+      }
+    }
     this.equalGain = this.model.equalGain();
+
+    if (this.equalGain < 0) {
+      console.log("Gain cannot be lower then 0");
+    }
+
     this.eui = this.model.calcExpectedUtilityI();
     this.euj = this.model.calcExpectedUtilityJ();
 
@@ -186,10 +234,10 @@ export default class Home extends Vue {
 
     this.paretoFrontier = this.model.paretoFrontier();
 
-    this.model.randomGain();
+    // this.model.randomGain();
 
-    this.eui = this.model.calcExpectedUtilityI();
-    this.euj = this.model.calcExpectedUtilityJ();
+    // this.eui = this.model.calcExpectedUtilityI();
+    // this.euj = this.model.calcExpectedUtilityJ();
 
     this.moveRandomP = this.p.move;
     this.moveRandomQ = this.q.move;
@@ -205,7 +253,33 @@ export default class Home extends Vue {
   }
 
   mounted() {
-    this.update();
+    const str = this.$route.params["q"];
+
+    if (str) {
+      this.dirty = true;
+      const items = str?.split("|");
+      let i = 1;
+      this.model.iSupply.supply.actor.name = items[i++];
+      this.model.jSupply.supply.actor.name = items[i++];
+      this.model.iSupply.supply.exchange.issue = items[i++];
+      this.model.jSupply.supply.exchange.issue = items[i++];
+      this.model.iSupply.supply.actor.power = parseFloat(items[i++]);
+      this.model.jSupply.supply.actor.power = parseFloat(items[i++]);
+
+      this.model.iSupply.supply.salience = parseFloat(items[i++]);
+      this.model.iSupply.supply.position = parseFloat(items[i++]);
+
+      this.model.jSupply.supply.salience = parseFloat(items[i++]);
+      this.model.jSupply.supply.position = parseFloat(items[i++]);
+
+      this.model.rValue = parseFloat(items[i++]);
+      this.model.pValue = parseFloat(items[i++]);
+
+      this.model.selectedActor = items[i++];
+      this.model.extraGainOrLoss = items[i++];
+      this.dirty = false;
+    }
+    this.update(false);
   }
 }
 </script>

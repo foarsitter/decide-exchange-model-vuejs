@@ -51,7 +51,10 @@ export default class Exchange {
   }
 
   MDSDelta(): number {
-    return Math.abs(this.MDS() - this.MDSVoting());
+    const mds = this.MDS();
+    const mdsVoting = this.MDSVoting();
+
+    return Math.abs(mds - mdsVoting);
   }
 
   applyMove(): void {
@@ -80,8 +83,7 @@ export default class Exchange {
 
   ExchangeRatioParetoOptimal(): number {
     return (
-      (Math.abs(this.supply.position - this.demand.position) *
-        this.supply.calcPowerSalience()) /
+      (this.PositionDelta() * this.supply.calcPowerSalience()) /
       this.calcPowerSalience()
     );
   }

@@ -26,8 +26,6 @@ export default class Interchange {
     this.partialShiftExchange = this.q;
 
     this.selectedActor = this.p.demand.actor.name;
-
-    this.calcSupplyDemandIssue();
   }
 
   zeroUtilityI(): number {
@@ -176,6 +174,7 @@ export default class Interchange {
   }
 
   negotiate() {
+    this.calcSupplyDemandIssue();
     this.calcMoveByExchangeRatio();
     this.calcMoveParetoOptimal();
 
@@ -204,34 +203,6 @@ export default class Interchange {
     q.move = Math.abs(q.demand.position - q.supply.position);
 
     return q.move;
-  }
-
-  interval(): number[] {
-    const eu = this.calcExpectedUtilityI();
-
-    const x =
-      eu +
-      this.pValue *
-        this.rValue *
-        (this.extraGainOrLoss ? this.euMaxI : this.euMaxJ - eu);
-    const y = eu - this.pValue * this.rValue * eu;
-
-    return [x, y];
-  }
-
-  interval2(): number[] {
-    this.pValue = 0.25;
-    const eu = this.calcExpectedUtilityI();
-
-    const x = eu + this.pValue * (this.euMaxJ - eu);
-
-    const y = eu - this.pValue * eu;
-
-    return [x, y];
-  }
-
-  calcParetoSwiftPoint(): number {
-    return 0;
   }
 
   dance(): void {

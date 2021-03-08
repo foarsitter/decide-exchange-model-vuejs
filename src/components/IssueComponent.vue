@@ -112,6 +112,8 @@ export default class ExchangeComponent extends Vue {
 
   actor_issues = [this.exchange.i, this.exchange.j];
 
+  hidden = false;
+
   actorName(index: number) {
     if (index == 2) {
       return "mds";

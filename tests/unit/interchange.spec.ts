@@ -63,6 +63,26 @@ function InterchangeFactory2(): Interchange {
   return new Interchange(p, q);
 }
 
+function InterchangeFactoryBelowZero(): Interchange {
+  // i in the excel sheet
+  const china = new Actor("China", 0.85);
+  const usa = new Actor("USA", 1.0);
+
+  const p = new Exchange(
+    "Fin Vol",
+    new ActorIssue(china, 100, 0.5),
+    new ActorIssue(usa, 0, 0.35)
+  );
+
+  const q = new Exchange(
+    "Fin Who",
+    new ActorIssue(china, 0, 0.8),
+    new ActorIssue(usa, 80, 0.5)
+  );
+
+  return new Interchange(p, q);
+}
+
 describe("interchange.ts", () => {
   it("check the initial positions in terms of demand and supply", () => {
     const model = InterchangeFactory();
@@ -272,5 +292,23 @@ describe("interchange.ts", () => {
     expect(model.zeroUtilityI()).toBeCloseTo(1907.69);
     expect(model.zeroUtilityIPosition()).toBeCloseTo(-19.5538461538462);
     expect(model.zeroUtilityJ()).toBeCloseTo(1362.64);
+  });
+
+  it("Should not have a equal gain lower then zero", () => {
+    const model = InterchangeFactoryBelowZero();
+
+    // model.p.supply.salience = 0.35;
+
+    let equalGain = model.equalGain();
+
+    // expect(equalGain).toBeCloseTo(0.32);
+
+    // model.p.supply.salience = 0.35;
+
+    // expect(model.p.supply.actor.name).toEqual("USA");
+
+    equalGain = model.equalGain();
+
+    expect(equalGain).toBeCloseTo(0.32);
   });
 });
