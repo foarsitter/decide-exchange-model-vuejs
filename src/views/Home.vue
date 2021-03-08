@@ -65,7 +65,6 @@ import Interchange from "@/model/interchange";
 import VueApexCharts from "vue-apexcharts";
 import ResultsComponent from "@/components/ResultsComponent.vue";
 import REXComponent from "@/components/REXComponent.vue";
-import { compressToBase64, decompressFromBase64 } from "lz-string";
 
 @Component({
   components: {
@@ -193,9 +192,7 @@ export default class Home extends Vue {
       objects.push(this.model.selectedActor);
       objects.push(this.model.extraGainOrLoss);
 
-      const str = objects.join("|");
-
-      const compressed = str; //compressToBase64(str);
+      const compressed = objects.join("|");
 
       if (this.$route.params["q"] != compressed) {
         console.log(compressed);
@@ -261,8 +258,13 @@ export default class Home extends Vue {
       let i = 1;
       this.model.iSupply.supply.actor.name = items[i++];
       this.model.jSupply.supply.actor.name = items[i++];
-      this.model.iSupply.supply.exchange.issue = items[i++];
-      this.model.jSupply.supply.exchange.issue = items[i++];
+      if (this.model.iSupply.supply.exchange !== undefined) {
+        this.model.iSupply.supply.exchange.issue = items[i++];
+      }
+
+      if (this.model.jSupply.supply.exchange !== undefined) {
+        this.model.jSupply.supply.exchange.issue = items[i++];
+      }
       this.model.iSupply.supply.actor.power = parseFloat(items[i++]);
       this.model.jSupply.supply.actor.power = parseFloat(items[i++]);
 
