@@ -211,7 +211,6 @@ export default class Home extends Vue {
       objects.push(this.model.extraGainOrLoss);
 
       const compressed = objects.join(this.splitChar);
-      console.log(compressed);
 
       if (this.$route.params["q"] != compressed) {
         this.url = compressed;
@@ -224,8 +223,8 @@ export default class Home extends Vue {
       console.log("Gain cannot be lower then 0");
     }
 
-    this.eui = this.model.calcExpectedUtilityI();
-    this.euj = this.model.calcExpectedUtilityJ();
+    // this.eui = this.model.calcExpectedUtilityI();
+    // this.euj = this.model.calcExpectedUtilityJ();
 
     this.mdsPVoting = this.model.p.MDSVoting();
     this.mdsQVoting = this.model.q.MDSVoting();
@@ -250,10 +249,17 @@ export default class Home extends Vue {
 
     this.paretoFrontier = this.model.paretoFrontier();
 
-    // this.model.randomGain();
+    const rex = this.model.rex();
 
-    // this.eui = this.model.calcExpectedUtilityI();
-    // this.euj = this.model.calcExpectedUtilityJ();
+    if (this.model.selectedActor == this.model.iSupply.demand.actor.name) {
+      this.eui = rex[2][0];
+      this.euj = rex[0][1];
+    } else {
+      this.eui = rex[0][0];
+      this.euj = rex[2][1];
+    }
+
+    this.model.randomGain();
 
     this.moveRandomP = this.p.move;
     this.moveRandomQ = this.q.move;

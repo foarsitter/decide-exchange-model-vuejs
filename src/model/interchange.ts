@@ -26,6 +26,7 @@ export default class Interchange {
     this.partialShiftExchange = this.q;
 
     this.selectedActor = this.p.demand.actor.name;
+    this.calcSupplyDemandIssue();
   }
 
   zeroUtilityI(): number {
@@ -270,7 +271,7 @@ export default class Interchange {
     return positionForZero(this.jSupply, this.jDemand);
   }
 
-  xyzI(multiplier = 1): number[][] {
+  rexI(multiplier = 1): number[][] {
     const r = this.rValue;
     const eu = this.equalGain();
 
@@ -355,7 +356,7 @@ export default class Interchange {
     ];
   }
 
-  xyzJ(multiplier = 1): number[][] {
+  rexJ(multiplier = 1): number[][] {
     const r = this.rValue;
     const eu = this.equalGain();
 
@@ -454,49 +455,59 @@ export default class Interchange {
     ];
   }
 
-  xyz(multiplier = 1): number[][] {
+  rex(multiplier = 1): number[][] {
     if (this.selectedActor == this.iSupply.demand.actor.name) {
-      return this.xyzI(multiplier);
+      return this.rexI(multiplier);
     } else {
-      return this.xyzJ(multiplier);
+      return this.rexJ(multiplier);
     }
   }
 
   randomGain(): number {
-    const f = this.xyz()[1];
+    const rex = this.rex();
 
-    const utilityI = f[0];
-    const utilityJ = f[1];
+    let eui;
+    let euj;
 
-    if (this.positionForZeroGainI() < 0) {
-      this.swapParetoOptimalIssue();
-      this.paretoOptimalExchange.move = Math.abs(
-        this.paretoOptimalExchange.demand.position -
-          this.paretoOptimalExchange.supply.position
-      );
+    if (this.selectedActor == this.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      euj = rex[0][0];
+      eui = rex[2][1];
     }
 
-    const lossPartialIssue = this.paretoOptimalExchange.Gain() - utilityJ;
+    const exchangeRatioQ = this.paretoOptimalExchange.ExchangeRatioParetoOptimal();
 
-    const deltaMDS =
-      lossPartialIssue / this.partialShiftExchange.supply.salience;
+    const exchangeRatioP =
+      (euj + exchangeRatioQ * this.paretoOptimalExchange.supply.salience) /
+      this.partialShiftExchange.demand.salience;
 
-    const newMDS = this.partialShiftExchange.MDS() - deltaMDS;
+    let movePartial =
+      (exchangeRatioP * this.partialShiftExchange.calcPowerSalience()) /
+      this.partialShiftExchange.supply.calcPowerSalience();
 
-    const positionPowerSalience =
-      this.partialShiftExchange.demand.calcPositionPowerSalience() +
-      this.partialShiftExchange.supply.calcPowerSalience() *
-        this.partialShiftExchange.demand.position;
-    const voting =
-      (newMDS * this.partialShiftExchange.calcPowerSalience() -
-        positionPowerSalience) /
-      this.partialShiftExchange.supply.salience;
+    if (movePartial > this.partialShiftExchange.PositionDelta()) {
+      // switch supply and demand
+      this.swapParetoOptimalIssue();
 
-    this.partialShiftExchange.move =
-      this.partialShiftExchange.supply.position - voting;
+      const exchangeRatioQ = this.paretoOptimalExchange.ExchangeRatioParetoOptimal();
 
-    this.partialShiftExchange.votingPosition = voting;
+      const exchangeRatioP =
+        (eui + exchangeRatioQ * this.paretoOptimalExchange.supply.salience) /
+        this.partialShiftExchange.demand.salience;
 
-    return voting;
+      movePartial =
+        (exchangeRatioP * this.partialShiftExchange.calcPowerSalience()) /
+        this.partialShiftExchange.supply.calcPowerSalience();
+    }
+
+    this.paretoOptimalExchange.move = this.paretoOptimalExchange.PositionDelta();
+    this.paretoOptimalExchange.applyMove();
+
+    this.partialShiftExchange.move = movePartial;
+    this.partialShiftExchange.applyMove();
+
+    return movePartial;
   }
 }

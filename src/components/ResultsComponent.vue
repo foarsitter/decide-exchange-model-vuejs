@@ -262,7 +262,7 @@ export default class ResultsComponent extends Vue {
       },
       {
         name: "REX",
-        data: this.model.xyz(1)
+        data: this.model.rex(1)
       }
     ];
   }
