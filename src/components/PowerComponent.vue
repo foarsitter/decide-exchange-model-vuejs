@@ -5,8 +5,18 @@
         <h1 class="card-header-title">
           Power
         </h1>
+        <a
+          v-if="hidden"
+          class="card-header-icon card-toggle"
+          @click="hidden = false"
+        >
+          Show
+        </a>
+        <a v-else class="card-header-icon card-toggle" @click="hidden = true">
+          Hide
+        </a>
       </header>
-      <div class="card-content">
+      <div class="card-content" v-if="!hidden">
         <SingleValueSlider v-model="rabbit.power"
           ><template v-slot:icon>{{ rabbit.name }}</template></SingleValueSlider
         >
@@ -35,5 +45,7 @@ export default class PowerComponent extends Vue {
 
   @Prop(Actor)
   turtle!: Actor;
+
+  hidden = false;
 }
 </script>

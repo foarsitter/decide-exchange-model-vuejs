@@ -3,14 +3,22 @@
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">
-          Data (versie 1.0)
+          Data
         </p>
-        <a class="card-header-icon card-toggle">
-          x
+        <a
+          v-if="hidden"
+          class="card-header-icon card-toggle"
+          @click="hidden = false"
+        >
+          Show
+        </a>
+        <a v-else class="card-header-icon card-toggle" @click="hidden = true">
+          Hide
         </a>
       </header>
 
       <table
+        v-if="!hidden"
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
         <thead>
@@ -168,6 +176,8 @@ import SingleValueSlider from "@/components/sliders/SingleValueSlider.vue";
 export default class REXComponent extends Vue {
   @Prop(Interchange)
   model!: Interchange;
+
+  hidden = false;
 }
 </script>
 

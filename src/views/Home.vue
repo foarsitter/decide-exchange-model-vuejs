@@ -1,56 +1,57 @@
 <template>
   <div class="container is-fluid">
-    <p>url: https://decide-exchange-model.netlify.app/#/model/{{ url }}</p>
-    <div class="columns">
-      <div class="column">
-        <ConfigTable v-bind:model="model"></ConfigTable>
-        <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
-        <Exchange
-          v-bind:exchange="p"
-          v-bind:mds-voting="mdsPVoting"
-          v-bind:mds-random="mdsRandomP"
-          v-bind:voting-position="votingPositionP"
-          v-bind:voting-random="votingRandomP"
-          v-bind:move="moveP"
-          v-bind:move-random="moveRandomP"
-          v-bind:exchange-ratio="exchangeRatioP"
-          v-bind:exchange-ratio-random="exchangeRatioRandomP"
-        >
-          <template #title>{{ p.issue }}</template>
-        </Exchange>
-        <Exchange
-          v-bind:exchange="q"
-          v-bind:mds-voting="mdsQVoting"
-          v-bind:mds-random="mdsRandomQ"
-          v-bind:voting-position="votingPositionQ"
-          v-bind:voting-random="votingRandomQ"
-          v-bind:move="moveQ"
-          v-bind:move-random="moveRandomQ"
-          v-bind:exchange-ratio="exchangeRatioQ"
-          v-bind:exchange-ratio-random="exchangeRatioRandomQ"
-        >
-          <template #title>{{ q.issue }}</template>
-        </Exchange>
-      </div>
-      <div class="column">
-        <REXComponent v-bind:model="model"></REXComponent>
-        <ResultsComponent
-          v-bind:model="model"
-          v-bind:eui="eui"
-          v-bind:euj="euj"
-          v-bind:exchangeRatioQ="exchangeRatioQ"
-          v-bind:exchangeRatioP="exchangeRatioP"
-          v-bind:equal-gain="equalGain"
-          v-bind:eu-max-i="euMaxI"
-          v-bind:eu-max-j="euMaxJ"
-          v-bind:supply-loss-i="supplyLossI"
-          v-bind:supply-loss-j="supplyLossJ"
-          v-bind:demand-gain-i="demandGainI"
-          v-bind:demand-gain-j="demandGainJ"
-          v-bind:pareto-frontier="paretoFrontier"
-        ></ResultsComponent>
-      </div>
-    </div>
+    <p>
+      url:
+      <a :href="href()"
+        >https://decide-exchange-model.netlify.app/#/model/{{ url }}
+      </a>
+    </p>
+    <ConfigTable v-bind:model="model"></ConfigTable>
+    <Power v-bind:rabbit="i" v-bind:turtle="j"></Power>
+    <Exchange
+      v-bind:exchange="p"
+      v-bind:mds-voting="mdsPVoting"
+      v-bind:mds-random="mdsRandomP"
+      v-bind:voting-position="votingPositionP"
+      v-bind:voting-random="votingRandomP"
+      v-bind:move="moveP"
+      v-bind:move-random="moveRandomP"
+      v-bind:exchange-ratio="exchangeRatioP"
+      v-bind:exchange-ratio-random="exchangeRatioRandomP"
+    >
+      <template #title>{{ p.issue }}</template>
+    </Exchange>
+    <Exchange
+      v-bind:exchange="q"
+      v-bind:mds-voting="mdsQVoting"
+      v-bind:mds-random="mdsRandomQ"
+      v-bind:voting-position="votingPositionQ"
+      v-bind:voting-random="votingRandomQ"
+      v-bind:move="moveQ"
+      v-bind:move-random="moveRandomQ"
+      v-bind:exchange-ratio="exchangeRatioQ"
+      v-bind:exchange-ratio-random="exchangeRatioRandomQ"
+    >
+      <template #title>{{ q.issue }}</template>
+    </Exchange>
+
+    <ResultsComponent
+      v-bind:model="model"
+      v-bind:eui="eui"
+      v-bind:euj="euj"
+      v-bind:exchangeRatioQ="exchangeRatioQ"
+      v-bind:exchangeRatioP="exchangeRatioP"
+      v-bind:equal-gain="equalGain"
+      v-bind:eu-max-i="euMaxI"
+      v-bind:eu-max-j="euMaxJ"
+      v-bind:supply-loss-i="supplyLossI"
+      v-bind:supply-loss-j="supplyLossJ"
+      v-bind:demand-gain-i="demandGainI"
+      v-bind:demand-gain-j="demandGainJ"
+      v-bind:pareto-frontier="paretoFrontier"
+    ></ResultsComponent>
+
+    <REXComponent v-bind:model="model"></REXComponent>
   </div>
 </template>
 
@@ -96,6 +97,8 @@ export default class Home extends Vue {
     new ActorIssue(this.j, 80, 0.5)
   );
   model = new Interchange(this.p, this.q);
+
+  splitChar = ";";
 
   eui = 0;
   euj = 0;
@@ -145,6 +148,8 @@ export default class Home extends Vue {
 
   url = "";
 
+  @Watch("p.issue")
+  @Watch("q.issue")
   @Watch("i.name")
   @Watch("j.name")
   @Watch("i.power")
@@ -172,6 +177,10 @@ export default class Home extends Vue {
     }
   }
 
+  href() {
+    return "https://decide-exchange-model.netlify.app/#/model/" + this.url;
+  }
+
   update(redirect: boolean) {
     if (redirect) {
       const objects = [];
@@ -186,8 +195,14 @@ export default class Home extends Vue {
       objects.push(this.model.iSupply.supply.salience);
       objects.push(this.model.iSupply.supply.position);
 
+      objects.push(this.model.iSupply.demand.salience);
+      objects.push(this.model.iSupply.demand.position);
+
       objects.push(this.model.jSupply.supply.salience);
       objects.push(this.model.jSupply.supply.position);
+
+      objects.push(this.model.jSupply.demand.salience);
+      objects.push(this.model.jSupply.demand.position);
 
       objects.push(this.model.rValue);
       objects.push(this.model.pValue);
@@ -195,10 +210,10 @@ export default class Home extends Vue {
       objects.push(this.model.selectedActor);
       objects.push(this.model.extraGainOrLoss);
 
-      const compressed = objects.join("|");
+      const compressed = objects.join(this.splitChar);
+      console.log(compressed);
 
       if (this.$route.params["q"] != compressed) {
-        console.log(compressed);
         this.url = compressed;
         this.$router.push({ name: "Home", params: { q: compressed } });
       }
@@ -258,7 +273,7 @@ export default class Home extends Vue {
 
     if (str) {
       this.dirty = true;
-      const items = str?.split("|");
+      const items = str?.split(this.splitChar);
       let i = 1;
       this.model.iSupply.supply.actor.name = items[i++];
       this.model.jSupply.supply.actor.name = items[i++];
@@ -275,8 +290,14 @@ export default class Home extends Vue {
       this.model.iSupply.supply.salience = parseFloat(items[i++]);
       this.model.iSupply.supply.position = parseFloat(items[i++]);
 
+      this.model.iSupply.demand.salience = parseFloat(items[i++]);
+      this.model.iSupply.demand.position = parseFloat(items[i++]);
+
       this.model.jSupply.supply.salience = parseFloat(items[i++]);
       this.model.jSupply.supply.position = parseFloat(items[i++]);
+
+      this.model.jSupply.demand.salience = parseFloat(items[i++]);
+      this.model.jSupply.demand.position = parseFloat(items[i++]);
 
       this.model.rValue = parseFloat(items[i++]);
       this.model.pValue = parseFloat(items[i++]);

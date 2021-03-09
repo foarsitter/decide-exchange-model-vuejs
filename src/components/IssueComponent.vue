@@ -5,8 +5,18 @@
         <h1 class="card-header-title">
           <slot name="title"></slot>
         </h1>
+        <a
+          v-if="hidden"
+          class="card-header-icon card-toggle"
+          @click="hidden = false"
+        >
+          Show
+        </a>
+        <a v-else class="card-header-icon card-toggle" @click="hidden = true">
+          Hide
+        </a>
       </header>
-      <div class="card-content">
+      <div class="card-content" v-if="!hidden">
         <div class="columns">
           <div class="column">
             <vue-slider
