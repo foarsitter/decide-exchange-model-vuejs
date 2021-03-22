@@ -82,7 +82,7 @@ export default class Interchange {
     );
   }
 
-  hasKnik(): boolean {
+  hasOffset(): boolean {
     const posI = this.zeroUtilityIPosition();
     const posJ = this.zeroUtilityJPosition();
 
@@ -90,7 +90,7 @@ export default class Interchange {
   }
 
   get euMaxI(): number {
-    if (!this.hasKnik()) {
+    if (!this.hasOffset()) {
       return this.zeroUtilityI();
     }
 
@@ -99,7 +99,7 @@ export default class Interchange {
   }
 
   get euMaxJ(): number {
-    if (!this.hasKnik()) {
+    if (!this.hasOffset()) {
       return this.zeroUtilityJ();
     }
 
@@ -244,11 +244,23 @@ export default class Interchange {
     this.negotiate();
 
     if (this.positionForZeroGainI() < this.jDemand.demand.position) {
-      this.euMaxJ;
       this.iSupply.votingPosition = this.iSupply.demand.position;
-      this.jSupply.votingPosition = this.jSupply.demand.position;
+      // this.jSupply.votingPosition = this.jSupply.demand.position;
 
       if (this.calcExpectedUtilityI() > 0 && this.calcExpectedUtilityJ() > 0) {
+        return [
+          [0, this.euMaxI],
+          [this.calcExpectedUtilityI(), this.calcExpectedUtilityJ()],
+          [this.euMaxJ, 0]
+        ];
+      }
+    }
+
+    if (this.positionForZeroGainJ() < this.iDemand.demand.position) {
+      this.jSupply.votingPosition = this.jSupply.demand.position;
+      // this.jSupply.votingPosition = this.jSupply.demand.position;
+
+      if (this.calcExpectedUtilityJ() > 0 && this.calcExpectedUtilityI() > 0) {
         return [
           [0, this.euMaxI],
           [this.calcExpectedUtilityI(), this.calcExpectedUtilityJ()],

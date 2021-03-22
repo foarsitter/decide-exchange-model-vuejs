@@ -2,6 +2,7 @@ import Interchange from "@/model/interchange";
 import Actor from "@/model/actor";
 import ActorIssue from "@/model/actorIssue";
 import Exchange from "@/model/exchange";
+import { maxExpectedUtility } from "@/model/calculations";
 
 function InterchangeFactory(): Interchange {
   // i in the excel sheet
@@ -78,6 +79,26 @@ function InterchangeFactoryBelowZero(): Interchange {
     "Fin Who",
     new ActorIssue(china, 0, 0.8),
     new ActorIssue(usa, 80, 0.5)
+  );
+
+  return new Interchange(p, q);
+}
+
+function ChinaUsaFinVolEAA(): Interchange {
+  // i in the excel sheet
+  const china = new Actor("China", 1);
+  const usa = new Actor("USA", 1);
+
+  const p = new Exchange(
+    "Fin Vol",
+    new ActorIssue(china, 100, 0.5),
+    new ActorIssue(usa, 0, 0.7)
+  );
+
+  const q = new Exchange(
+    "EAA",
+    new ActorIssue(china, 0, 0.65),
+    new ActorIssue(usa, 100, 0.4)
   );
 
   return new Interchange(p, q);
@@ -280,6 +301,7 @@ describe("interchange.ts", () => {
     model.equalGain();
 
     expect(model.zeroUtilityI()).toBeCloseTo(1907.69);
+
     expect(model.euMaxI).toBeCloseTo(1614.5833333);
     expect(model.zeroUtilityJ()).toBeCloseTo(1362.63736263736);
     expect(model.zeroUtilityJ()).toBeCloseTo(model.euMaxJ);
@@ -310,5 +332,22 @@ describe("interchange.ts", () => {
     equalGain = model.equalGain();
 
     expect(equalGain).toBeGreaterThan(0);
+  });
+
+  it("Check maximum utility for USA", () => {
+    const model = ChinaUsaFinVolEAA();
+    model.equalGain();
+    model.randomGain();
+
+    const x = model.paretoFrontier();
+    // const offset = x[1];
+
+    // const yx1 = maxExpectedUtility(model.jDemand, model.jSupply);
+    // const yx2 = maxExpectedUtility(model.iDemand, model.iSupply);
+    // const yx3 = maxExpectedUtility(model.jSupply, model.jDemand);
+    // const yx4 = maxExpectedUtility(model.iSupply, model.iDemand);
+
+    expect(model.euMaxI).toBeCloseTo(16.3461538461538);
+    expect(model.euMaxJ).toBeCloseTo(13.875510204082);
   });
 });
