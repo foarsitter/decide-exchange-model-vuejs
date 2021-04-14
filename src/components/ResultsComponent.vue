@@ -97,6 +97,8 @@
               :options="chartOptions"
               :series="series"
               type="line"
+              height="600px"
+              width="600px"
             ></apexchart>
           </div>
         </div>
@@ -153,6 +155,8 @@ export default class ResultsComponent extends Vue {
 
   get chartOptions() {
     return {
+      width: "400px",
+      height: "400px",
       dataLabels: {
         enabled: true,
         formatter: function(val: number, opts: any) {
@@ -173,7 +177,7 @@ export default class ResultsComponent extends Vue {
           }
 
           if (x != 0) {
-            if (seriesIndex == 5) {
+            if (seriesIndex == 4) {
               return y + "; " + x;
             }
             {
@@ -196,23 +200,28 @@ export default class ResultsComponent extends Vue {
           show: false
         },
         decimalsInFloat: 0,
-        title: { text: this.model.iSupply.supply.actor.name }
+        title: { text: this.model.iSupply.supply.actor.name },
+        min: 0,
+        max: this.model.axisMax()
       },
       yaxis: {
         labels: {
           show: false
         },
         decimalsInFloat: 0,
-        title: { text: this.model.jSupply.supply.actor.name }
+        title: { text: this.model.jSupply.supply.actor.name },
+        min: 0,
+        max: this.model.axisMax()
       },
       colors: [
         "#008FFB", // loss j
         "#008FFB", // gain.ts j
         "#00E396", // loss i
         "#00E396", // loss i
-        "#FEB019", // Equal Gain
+        // "#FEB019", // Equal Gain
         "#FF4560", // Pareto frontier
-        "#775DD0" // REX
+        "#775DD0", // REX
+        "#afadad" // equal gain
       ]
     };
   }
@@ -247,14 +256,14 @@ export default class ResultsComponent extends Vue {
           [0, this.equalGain]
         ]
       },
-      {
-        name: "Equal Gain",
-        data: [
-          [0, this.equalGain],
-          [this.equalGain, this.equalGain],
-          [this.equalGain, 0]
-        ]
-      },
+      // {
+      //   name: "Equal Gain",
+      //   data: [
+      //     [0, this.equalGain],
+      //     [this.equalGain, this.equalGain],
+      //     [this.equalGain, 0]
+      //   ]
+      // },
       {
         name: "Pareto frontier",
 
@@ -263,6 +272,14 @@ export default class ResultsComponent extends Vue {
       {
         name: "REX",
         data: this.model.rex(1)
+      },
+      {
+        name: "Equal Gain",
+        // type: "area",
+        data: [
+          [0, 0],
+          [this.model.axisMax(), this.model.axisMax()]
+        ]
       }
     ];
   }

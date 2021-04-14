@@ -522,4 +522,8 @@ export default class Interchange {
 
     return movePartial;
   }
+
+  axisMax(): number {
+    return (10 * Math.max(this.euMaxJ, this.euMaxI)) / 9;
+  }
 }
