@@ -2,7 +2,6 @@ import Interchange from "@/model/interchange";
 import Actor from "@/model/actor";
 import ActorIssue from "@/model/actorIssue";
 import Exchange from "@/model/exchange";
-import { maxExpectedUtility } from "@/model/calculations";
 
 function InterchangeFactory(): Interchange {
   // i in the excel sheet
@@ -84,9 +83,9 @@ function InterchangeFactoryBelowZero(): Interchange {
   return new Interchange(p, q);
 }
 
-function ChinaUsaFinVolEAA(): Interchange {
+function ChinaUsaFinVolEAA(power = 1): Interchange {
   // i in the excel sheet
-  const china = new Actor("China", 1);
+  const china = new Actor("China", power);
   const usa = new Actor("USA", 1);
 
   const p = new Exchange(
@@ -102,6 +101,24 @@ function ChinaUsaFinVolEAA(): Interchange {
   );
 
   return new Interchange(p, q);
+}
+
+function BrazilUSAFinWhoFinVol(): Interchange {
+  const brazil = new Actor("Brazil", 0.7);
+  const usa = new Actor("USA", 1);
+
+  const finVol = new Exchange(
+    "Fin Vol",
+    new ActorIssue(brazil, 50, 0.55),
+    new ActorIssue(usa, 0, 0.9)
+  );
+
+  const finWho = new Exchange(
+    "Fin Who",
+    new ActorIssue(brazil, 0, 0.7),
+    new ActorIssue(usa, 80, 0.5)
+  );
+  return new Interchange(finWho, finVol);
 }
 
 describe("interchange.ts", () => {
@@ -261,11 +278,9 @@ describe("interchange.ts", () => {
 
     const x = model.randomGain();
 
-    expect(x).toBeCloseTo(55.41153846153845);
+    expect(x).toBeCloseTo(57.24);
 
-    expect(model.partialShiftExchange.MDSVoting()).toBeCloseTo(
-      23.08814102564102
-    );
+    expect(model.partialShiftExchange.MDSVoting()).toBeCloseTo(17.82);
   });
 
   it("Maximal utility 2", () => {
@@ -319,17 +334,7 @@ describe("interchange.ts", () => {
   it("Should not have a equal gain lower then zero", () => {
     const model = InterchangeFactoryBelowZero();
 
-    // model.p.supply.salience = 0.35;
-
-    let equalGain = model.equalGain();
-
-    // expect(equalGain).toBeCloseTo(0.32);
-
-    // model.p.supply.salience = 0.35;
-
-    // expect(model.p.supply.actor.name).toEqual("USA");
-
-    equalGain = model.equalGain();
+    const equalGain = model.equalGain();
 
     expect(equalGain).toBeGreaterThan(0);
   });
@@ -339,15 +344,71 @@ describe("interchange.ts", () => {
     model.equalGain();
     model.randomGain();
 
-    const x = model.paretoFrontier();
-    // const offset = x[1];
-
-    // const yx1 = maxExpectedUtility(model.jDemand, model.jSupply);
-    // const yx2 = maxExpectedUtility(model.iDemand, model.iSupply);
-    // const yx3 = maxExpectedUtility(model.jSupply, model.jDemand);
-    // const yx4 = maxExpectedUtility(model.iSupply, model.iDemand);
-
     expect(model.euMaxI).toBeCloseTo(16.3461538461538);
     expect(model.euMaxJ).toBeCloseTo(13.875510204082);
+  });
+
+  it("Validate exchange", () => {
+    const model = BrazilUSAFinWhoFinVol();
+    model.pValue = 0.9;
+    model.rValue = 0.5;
+    model.selectedActor = "Brazil";
+    model.extraGainOrLoss = "less";
+    const eg = model.equalGain();
+    expect(eg).toBeCloseTo(4.43);
+
+    const p = model.paretoFrontier();
+
+    const x = p[1][0],
+      y = p[1][1];
+
+    expect(x).toBeCloseTo(4.43);
+    expect(y).toBeCloseTo(4.43);
+
+    const rex = model.rex();
+
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+    expect(eui).toBeCloseTo(2.44);
+    expect(euj).toBeCloseTo(7.22);
+  });
+  it("Offset equals equal gain", () => {
+    const model = ChinaUsaFinVolEAA(0.75);
+    model.pValue = 0.9;
+    model.rValue = 0.5;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "less";
+    const eg = model.equalGain();
+    expect(eg).toBeCloseTo(8.47);
+
+    const p = model.paretoFrontier();
+
+    const x = p[1][0],
+      y = p[1][1];
+
+    expect(x).toBeCloseTo(8.47);
+    expect(y).toBeCloseTo(8.47);
+
+    const rex = model.rex();
+
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+
+    expect(euj).toBeCloseTo(13.09);
+    expect(eui).toBeLessThan(4);
   });
 });

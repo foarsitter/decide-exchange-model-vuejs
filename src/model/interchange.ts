@@ -299,7 +299,26 @@ export default class Interchange {
 
     const y = frontier[1][1];
 
+    let hasOffset;
+
     if (frontier.length == 3) {
+      const x1 = frontier[0][0];
+      const x2 = frontier[2][0];
+      const y1 = frontier[0][1];
+      const y2 = frontier[2][1];
+
+      const slope = (y2 - y1) / (x2 - x1);
+
+      const b = y1 - x1 * slope;
+
+      const y3 = frontier[1][0] * slope + b;
+
+      hasOffset = Math.round(y3 - frontier[1][1]) > 0;
+    } else {
+      hasOffset = false;
+    }
+
+    if (hasOffset) {
       if (this.extraGainOrLoss == "gain") {
         if (y < utility) {
           this.swapParetoOptimalIssue();
@@ -384,7 +403,26 @@ export default class Interchange {
 
     const x = frontier[1][0];
 
+    let hasOffset;
+
     if (frontier.length == 3) {
+      const x1 = frontier[0][0];
+      const x2 = frontier[2][0];
+      const y1 = frontier[0][1];
+      const y2 = frontier[2][1];
+
+      const slope = (y2 - y1) / (x2 - x1);
+
+      const b = y1 - x1 * slope;
+
+      const y3 = frontier[1][0] * slope + b;
+
+      hasOffset = Math.round(y3 - frontier[1][1]) > 0;
+    } else {
+      hasOffset = false;
+    }
+
+    if (hasOffset) {
       if (this.extraGainOrLoss == "gain") {
         if (x > utility) {
           this.swapParetoOptimalIssue();
