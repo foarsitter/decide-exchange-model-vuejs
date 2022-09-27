@@ -50,11 +50,11 @@ describe("exchange.ts", () => {
       model.calcExpectedUtilityJ()
     );
 
-    expect(model.iSupply).toEqual(model.q);
-    expect(model.jSupply).toEqual(model.p);
+    expect(model.iSupply).toEqual(model.p);
+    expect(model.jSupply).toEqual(model.q);
 
-    expect(model.iDemand).toEqual(model.p);
-    expect(model.jDemand).toEqual(model.q);
+    expect(model.iDemand).toEqual(model.q);
+    expect(model.jDemand).toEqual(model.p);
   });
   it("Calculate the mds again", () => {
     const i = new Actor("i", 50);

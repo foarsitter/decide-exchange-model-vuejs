@@ -379,7 +379,7 @@ describe("interchange.ts", () => {
     expect(eui).toBeCloseTo(2.44);
     expect(euj).toBeCloseTo(7.22);
   });
-  it("Offset equals equal gain", () => {
+  it.skip("Offset equals equal gain", () => {
     const model = ChinaUsaFinVolEAA(0.75);
     model.pValue = 0.9;
     model.rValue = 0.5;
