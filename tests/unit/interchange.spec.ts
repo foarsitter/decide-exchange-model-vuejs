@@ -467,4 +467,26 @@ describe("interchange.ts", () => {
     expect(euj).toBeCloseTo(15.6);
     expect(eui).toBeCloseTo(1.21);
   });
+  it("Offset equals equal gain 5", () => {
+    const model = ChinaUsaFinVolEAA(0.8);
+    model.pValue = 1;
+    model.rValue = 0.8;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "loss";
+
+    const rex = model.rex();
+
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+
+    expect(euj).toBeCloseTo(13.18);
+    expect(eui).toBeCloseTo(1.77);
+  });
 });

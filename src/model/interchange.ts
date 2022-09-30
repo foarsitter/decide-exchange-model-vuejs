@@ -433,6 +433,14 @@ export default class Interchange {
           [0, total * multiplier]
         ];
       } else {
+        if (Math.round(offsetX - eu) == 0) {
+          const total = this.rValue * (this.upperGainI() - eu) + eu;
+          return [
+            [utility * multiplier, 0],
+            [utility * multiplier, total * multiplier],
+            [0, total * multiplier]
+          ];
+        }
         if (offsetX > utility) {
           this.swapParetoOptimalIssue();
 
