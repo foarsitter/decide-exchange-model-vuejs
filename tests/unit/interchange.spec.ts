@@ -10,14 +10,14 @@ function InterchangeFactory(): Interchange {
 
   const p = new Exchange(
     "fin vol",
-    new ActorIssue(china, 100, 50),
-    new ActorIssue(usa, 0, 70)
+    new ActorIssue(china, 100, 0.5),
+    new ActorIssue(usa, 0, 0.7)
   );
 
   const q = new Exchange(
     "fin who",
-    new ActorIssue(china, 0, 80),
-    new ActorIssue(usa, 80, 50)
+    new ActorIssue(china, 0, 0.8),
+    new ActorIssue(usa, 80, 0.5)
   );
 
   return new Interchange(p, q);
@@ -158,16 +158,16 @@ describe("interchange.ts", () => {
 
     model.dance();
 
-    expect(model.calcExpectedUtilityI()).toBeCloseTo(993.589743589743);
-    expect(model.calcExpectedUtilityJ()).toBeCloseTo(993.589743589743);
+    expect(model.calcExpectedUtilityI()).toBeCloseTo(9.93589743589743);
+    expect(model.calcExpectedUtilityJ()).toBeCloseTo(9.93589743589743);
 
     expect(model.partialShiftExchange.MoveExceedsDelta()).toBeTruthy();
 
     model.swapParetoOptimalIssue();
     model.dance();
 
-    expect(model.calcExpectedUtilityI()).toBeCloseTo(794.871794871794);
-    expect(model.calcExpectedUtilityJ()).toBeCloseTo(794.871794871794);
+    expect(model.calcExpectedUtilityI()).toBeCloseTo(7.94871794871794);
+    expect(model.calcExpectedUtilityJ()).toBeCloseTo(7.94871794871794);
   });
 
   it("expected utility through update method", () => {
@@ -175,9 +175,9 @@ describe("interchange.ts", () => {
 
     model.negotiate();
 
-    expect(model.calcExpectedUtilityI()).toBeCloseTo(794.871794871794);
-    expect(model.calcExpectedUtilityJ()).toBeCloseTo(794.871794871794);
-    expect(model.equalGain()).toBeCloseTo(794.871794871794);
+    expect(model.calcExpectedUtilityI()).toBeCloseTo(7.94871794871794);
+    expect(model.calcExpectedUtilityJ()).toBeCloseTo(7.94871794871794);
+    expect(model.equalGain()).toBeCloseTo(7.94871794871794);
 
     expect(model.paretoOptimalExchange.move).toBe(80);
   });
@@ -187,16 +187,16 @@ describe("interchange.ts", () => {
     // model.iSupply.votingPosition = model.iSupply.demand.position;
     // model.jSupply.votingPosition = model.jSupply.demand.position;
 
-    expect(model.euMaxI).toBeCloseTo(1614.58);
-    expect(model.euMaxJ).toBeCloseTo(1362.63736263736);
+    expect(model.euMaxI).toBeCloseTo(16.1458);
+    expect(model.euMaxJ).toBeCloseTo(13.6263736263736);
   });
   it("pareto frontier", () => {
     const model = InterchangeFactory();
 
     const x = model.paretoFrontier()[1];
 
-    expect(x[0]).toBeCloseTo(378.21);
-    expect(x[1]).toBeCloseTo(1378.21);
+    expect(x[0]).toBeCloseTo(3.7821);
+    expect(x[1]).toBeCloseTo(13.7821);
   });
 
   it("USA new expected utilty (p=0.9, r=1)", () => {
@@ -209,8 +209,8 @@ describe("interchange.ts", () => {
 
     const x = model.rex();
 
-    expect(x[1][0]).toBeCloseTo(131.15);
-    expect(x[1][1]).toBeCloseTo(1532.61);
+    expect(x[1][1]).toBeCloseTo(15.3261);
+    expect(x[1][0]).toBeCloseTo(1.3115);
   });
 
   it("Extra gain for USA (p=0.9, r=0.5)", () => {
@@ -223,8 +223,8 @@ describe("interchange.ts", () => {
 
     const x = model.rex();
 
-    expect(x[1][0]).toBeCloseTo(531.39);
-    expect(x[1][1]).toBeCloseTo(1163.74);
+    expect(x[1][0]).toBeCloseTo(5.3139);
+    expect(x[1][1]).toBeCloseTo(11.6374);
   });
 
   it("Extra loss for China (p=0.9, r=0.5)", () => {
@@ -237,8 +237,8 @@ describe("interchange.ts", () => {
 
     const x = model.rex();
 
-    expect(x[1][0]).toBeCloseTo(437.179);
-    expect(x[1][1]).toBeCloseTo(1295.64);
+    expect(x[1][0]).toBeCloseTo(4.37179);
+    expect(x[1][1]).toBeCloseTo(12.96);
   });
 
   it("China extra expected utilty (p=0.9, r=1)", () => {
@@ -251,8 +251,8 @@ describe("interchange.ts", () => {
 
     const x = model.rex();
 
-    expect(x[1][0]).toBeCloseTo(1305.8608058608);
-    expect(x[1][1]).toBeCloseTo(79.49);
+    expect(x[1][0]).toBeCloseTo(13.058608058608);
+    expect(x[1][1]).toBeCloseTo(0.7949);
   });
 
   it("China less expected utilty (p=0.9, r=1)", () => {
@@ -261,12 +261,22 @@ describe("interchange.ts", () => {
     model.pValue = 0.9;
     model.rValue = 1;
     model.selectedActor = "China";
-    model.extraGainOrLoss = "less";
+    model.extraGainOrLoss = "loss";
 
-    const x = model.rex();
+    const rex = model.rex();
 
-    expect(x[1][0]).toBeCloseTo(79.49);
-    expect(x[1][1]).toBeCloseTo(1564.903);
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+
+    expect(eui).toBeCloseTo(0.7949);
+    expect(euj).toBeCloseTo(15.65);
   });
   it("New exchange", () => {
     const model = InterchangeFactory();
@@ -315,10 +325,10 @@ describe("interchange.ts", () => {
     const model = InterchangeFactory();
     model.equalGain();
 
-    expect(model.zeroUtilityI()).toBeCloseTo(1907.69);
+    expect(model.zeroUtilityI()).toBeCloseTo(19.0769);
 
-    expect(model.euMaxI).toBeCloseTo(1614.5833333);
-    expect(model.zeroUtilityJ()).toBeCloseTo(1362.63736263736);
+    expect(model.euMaxI).toBeCloseTo(16.145833333);
+    expect(model.zeroUtilityJ()).toBeCloseTo(13.6263736263736);
     expect(model.zeroUtilityJ()).toBeCloseTo(model.euMaxJ);
   });
 
@@ -354,16 +364,6 @@ describe("interchange.ts", () => {
     model.rValue = 0.5;
     model.selectedActor = "Brazil";
     model.extraGainOrLoss = "less";
-    const eg = model.equalGain();
-    expect(eg).toBeCloseTo(4.43);
-
-    const p = model.paretoFrontier();
-
-    const x = p[1][0],
-      y = p[1][1];
-
-    expect(x).toBeCloseTo(4.43);
-    expect(y).toBeCloseTo(4.43);
 
     const rex = model.rex();
 
@@ -379,22 +379,12 @@ describe("interchange.ts", () => {
     expect(eui).toBeCloseTo(2.44);
     expect(euj).toBeCloseTo(7.22);
   });
-  it.skip("Offset equals equal gain", () => {
-    const model = ChinaUsaFinVolEAA(0.75);
-    model.pValue = 0.9;
+  it("Offset equals equal gain", () => {
+    const model = ChinaUsaFinVolEAA(0.8);
+    model.pValue = 1;
     model.rValue = 0.5;
-    model.selectedActor = "China";
-    model.extraGainOrLoss = "less";
-    const eg = model.equalGain();
-    expect(eg).toBeCloseTo(8.47);
-
-    const p = model.paretoFrontier();
-
-    const x = p[1][0],
-      y = p[1][1];
-
-    expect(x).toBeCloseTo(8.47);
-    expect(y).toBeCloseTo(8.47);
+    model.selectedActor = "USA";
+    model.extraGainOrLoss = "gain";
 
     const rex = model.rex();
 
@@ -408,7 +398,73 @@ describe("interchange.ts", () => {
       euj = rex[2][1];
     }
 
-    expect(euj).toBeCloseTo(13.09);
-    expect(eui).toBeLessThan(4);
+    expect(eui).toBeCloseTo(4.42);
+    expect(euj).toBeCloseTo(11.55);
+  });
+  it("Offset equals equal gain 2", () => {
+    const model = ChinaUsaFinVolEAA(1);
+    model.pValue = 1;
+    model.rValue = 0.5;
+    model.selectedActor = "USA";
+    model.extraGainOrLoss = "less";
+
+    const rex = model.rex();
+
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+
+    expect(euj).toBeCloseTo(4.05);
+    expect(eui).toBeCloseTo(10.99);
+  });
+  it("Offset equals equal gain 3", () => {
+    const model = ChinaUsaFinVolEAA(1);
+    model.pValue = 1;
+    model.rValue = 0.5;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "less";
+
+    const rex = model.rex();
+
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+
+    expect(euj).toBeCloseTo(13.76);
+    expect(eui).toBeCloseTo(4.05);
+  });
+  it("Offset equals equal gain 4", () => {
+    const model = ChinaUsaFinVolEAA(1);
+    model.pValue = 1;
+    model.rValue = 0.85;
+    model.selectedActor = "China";
+    model.extraGainOrLoss = "less";
+
+    const rex = model.rex();
+
+    let eui, euj;
+
+    if (model.selectedActor == model.iSupply.demand.actor.name) {
+      eui = rex[2][0];
+      euj = rex[0][1];
+    } else {
+      eui = rex[0][0];
+      euj = rex[2][1];
+    }
+
+    expect(euj).toBeCloseTo(15.6);
+    expect(eui).toBeCloseTo(1.21);
   });
 });

@@ -345,13 +345,7 @@ export default class Interchange {
           this.swapParetoOptimalIssue();
         }
 
-        const gain = this.paretoOptimalExchange.Loss() + utility;
-
-        const delta = gain / this.partialShiftExchange.demand.salience;
-
-        const loss = delta * this.partialShiftExchange.supply.salience;
-
-        const total = Math.abs(this.paretoOptimalExchange.Gain() - loss);
+        const total = this.rValue * (this.upperGainJ() - eu) + eu;
 
         return [
           [0, utility * multiplier],
@@ -431,13 +425,7 @@ export default class Interchange {
           ];
         }
 
-        const loss = this.paretoOptimalExchange.Gain() - utility;
-
-        const delta = loss / this.partialShiftExchange.supply.salience;
-
-        const gain = delta * this.partialShiftExchange.demand.salience;
-
-        const total = Math.abs(gain - this.paretoOptimalExchange.Loss());
+        const total = this.rValue * (this.lowerLoss() - eu) + eu;
 
         return [
           [utility * multiplier, 0],
