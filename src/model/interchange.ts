@@ -297,11 +297,19 @@ export default class Interchange {
 
     const frontier = this.paretoFrontier();
 
-    const y = frontier[1][1];
+    const offsetY = frontier[1][1];
 
     if (this.hasFrontierAnOffset(frontier)) {
       if (this.extraGainOrLoss == "gain") {
-        if (y < utility) {
+        if (offsetY == eu) {
+          const total = eu - r * (eu - this.lowerLoss());
+          return [
+            [0, utility * multiplier],
+            [total * multiplier, utility * multiplier],
+            [total * multiplier, 0]
+          ];
+        }
+        if (utility > offsetY) {
           this.swapParetoOptimalIssue();
 
           const loss = this.paretoOptimalExchange.Gain() - utility;
@@ -333,7 +341,7 @@ export default class Interchange {
           [total * multiplier, 0]
         ];
       } else {
-        if (y < utility) {
+        if (offsetY < utility) {
           this.swapParetoOptimalIssue();
         }
 
@@ -401,11 +409,11 @@ export default class Interchange {
 
     const frontier = this.paretoFrontier();
 
-    const x = frontier[1][0];
+    const offsetX = frontier[1][0];
 
     if (this.hasFrontierAnOffset(frontier)) {
       if (this.extraGainOrLoss == "gain") {
-        if (x > utility) {
+        if (offsetX > utility) {
           this.swapParetoOptimalIssue();
 
           const gain = this.paretoOptimalExchange.Loss() + utility;
@@ -437,7 +445,7 @@ export default class Interchange {
           [0, total * multiplier]
         ];
       } else {
-        if (x > utility) {
+        if (offsetX > utility) {
           this.swapParetoOptimalIssue();
 
           const gain = this.paretoOptimalExchange.Loss() + utility;
